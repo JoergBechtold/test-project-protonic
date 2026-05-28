@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -15,9 +15,9 @@ import { Loading } from '../../shared/components/loading/loading';
 export class LoginComponent {
   username = '';
   password = '';
-  errorMessage = '';
+  errorMessage = signal('');
 
-  isLoading = false;
+  isLoading = signal(false);
 
   constructor(
     private http: HttpClient,
@@ -25,8 +25,8 @@ export class LoginComponent {
   ) {}
 
   async login() {
-    this.isLoading = true;
-    this.errorMessage = '';
+    this.isLoading.set(true);
+    this.errorMessage.set('');
 
     const body = new HttpParams()
       .set('grant_type', 'password')
@@ -47,9 +47,9 @@ export class LoginComponent {
       localStorage.setItem('token', response.access_token);
       this.router.navigate(['/main']);
     } catch {
-      this.errorMessage = 'Login fehlgeschlagen. Bitte überprüfe Benutzername und Passwort.';
+      this.errorMessage.set('Login fehlgeschlagen. Bitte überprüfe Benutzername und Passwort.');
     } finally {
-      this.isLoading = false;
+      this.isLoading.set(false);
     }
   }
 }
