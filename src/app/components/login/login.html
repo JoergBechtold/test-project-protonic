@@ -1,0 +1,10 @@
+<app-loading [visible]="isLoading" />
+<form (ngSubmit)="login()">
+    <input [(ngModel)]="username" name="username" placeholder="Benutzername" />
+    <input [(ngModel)]="password" name="password" type="password" placeholder="Passwort" />
+
+    <button type="submit">Login</button>
+    @if (errorMessage) {
+    <p class="error">{{ errorMessage }}</p>
+    }
+</form>
