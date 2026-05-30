@@ -1,25 +1,4 @@
-@if (!isLoading() && !errorMessage() && rows().length > 0) {
-<table>
-    <thead>
-        <tr>
-            @for (col of columns(); track col) {
-            <th>{{ col }}</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @for (row of rows(); track $index) {
-        <tr>
-            @for (col of columns(); track col) {
-            <td>{{ row[col] }}</td>
-            }
-        </tr>
-        }
-    </tbody>
-</table>
-}
 <app-loading [visible]="isLoading()" />
-
 
 @if (!isLoading() && errorMessage()) {
 <p class="error">{{ errorMessage() }}</p>
@@ -29,7 +8,7 @@
 <table>
     <thead>
         <tr>
-            @for (col of columns(); track col) {
+            @for (col of visibleColumns; track col) {
             <th>{{ col }}</th>
             }
         </tr>
@@ -37,7 +16,7 @@
     <tbody>
         @for (row of rows(); track $index) {
         <tr>
-            @for (col of columns(); track col) {
+            @for (col of visibleColumns; track col) {
             <td>{{ row[col] }}</td>
             }
         </tr>

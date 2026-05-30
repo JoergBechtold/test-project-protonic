@@ -14,7 +14,9 @@ export class MainComponent implements OnInit {
   columns = signal<string[]>([]);
   rows = signal<any[]>([]);
   isLoading = signal(true);
-  errorMessage = signal('Es ist ein Fehler aufgetreten.');
+  errorMessage = signal('ES ist ein Fehler aufgetreten.');
+
+  visibleColumns = ['type', 'cap subj', 'adr', 'ownr', 'start', 'prio', 'dir'];
 
   constructor(private apiService: ApiService) {}
 
