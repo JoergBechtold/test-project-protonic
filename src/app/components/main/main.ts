@@ -11,14 +11,10 @@ import { Loading } from '../../shared/components/loading/loading';
   styleUrls: ['./main.scss'],
 })
 export class MainComponent implements OnInit {
-  // Die Spalten-Definitionen aus der API (z.B. "type", "subj", "start"...)
   columns = signal<string[]>([]);
-
-  // Die eigentlichen Datenzeilen, als lesbare Objekte
   rows = signal<any[]>([]);
-
   isLoading = signal(true);
-  errorMessage = signal('ES ist ein Fehler aufgetreten.');
+  errorMessage = signal('Es ist ein Fehler aufgetreten.');
 
   constructor(private apiService: ApiService) {}
 
@@ -39,14 +35,15 @@ export class MainComponent implements OnInit {
       } else {
         this.columns.set([]);
         this.rows.set([]);
-        this.errorMessage.set('ES ist ein Fehler aufgetreten.');
+        this.errorMessage.set('Es ist ein Fehler aufgetreten.');
       }
     } catch (err) {
       console.error('API-Fehler:', err);
       this.columns.set([]);
       this.rows.set([]);
-      this.errorMessage.set('ES ist ein Fehler aufgetreten.');
+      this.errorMessage.set('Es ist ein Fehler aufgetreten.');
     } finally {
+      // Das Loading-Signal wird beendet. Das Popup reagiert sauber im Template darauf.
       this.isLoading.set(false);
     }
   }

@@ -1,0 +1,53 @@
+@import '../../../../styles.scss';
+
+.popup-container {
+    font: inherit;
+    text-align: center;
+    color: $button-text-color;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 15px;
+    margin: 0 auto;
+    max-width: 400px;
+    background: $background-color;
+    border-radius: 16px;
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+    padding: 2rem 1.5rem;
+    opacity: 0;
+    transform: translateY(120%);
+    pointer-events: none;
+    animation: popup-slide-out 0.5s ease-in-out forwards;
+}
+
+.popup-container.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+    animation: popup-slide-in 0.5s ease-in-out forwards;
+}
+
+@keyframes popup-slide-in {
+    from {
+        transform: translateY(120%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes popup-slide-out {
+    from {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(120%);
+        opacity: 0;
+    }
+}
