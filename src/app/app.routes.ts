@@ -9,7 +9,7 @@ export const routes: Routes = [
   {
     path: 'main',
     loadComponent: () => import('./components/main/main').then((module) => module.MainComponent),
-    // canActivate: [authGuard],
+    canActivate: [authGuard],
   },
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: '**', redirectTo: 'login' },
