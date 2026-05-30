@@ -1,1 +1,19 @@
-/* You can add global styles to this file, and also import other style files */
+// colors
+$primary-color: #ff6800;
+$background-color: #060B12;
+
+$button-gradient: linear-gradient(180deg, #23313a 0%, #0e1c25 100%);
+$button-gradient-dark: linear-gradient(180deg, #18222a 0%, #0a141a 100%);
+
+$error-color: #d32f2f;
+$input-border-color: #ccc;
+$button-text-color: #fff;
+
+
+body {
+    display: block;
+    height: 100dvh;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
