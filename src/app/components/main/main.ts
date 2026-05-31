@@ -18,12 +18,12 @@ export class MainComponent implements OnInit {
 
   visibleColumns = ['type', 'cap subj', 'adr', 'ownr', 'start', 'prio', 'dir'];
 
-  typeToIcon: { [key: number]: string } = {
-    8: 'clipboard-icon.png',
-    7: 'megaphon-icon.png',
-    3: 'edit-icon.png',
-    2: 'calendar-icon.png',
-    0: 'mail-icon.png',
+  typeToIconAndBg: { [key: number]: { icon: string; bg: string } } = {
+    8: { icon: 'clipboard-icon.png', bg: 'var(--icon-bg-orange)' },
+    7: { icon: 'megaphon-icon.png', bg: 'var(--icon-bg-blue)' },
+    3: { icon: 'edit-icon.png', bg: 'var(--icon-bg-purple)' },
+    2: { icon: 'calendar-icon.png', bg: 'var(--icon-bg-green)' },
+    0: { icon: 'mail-icon.png', bg: 'var(--icon-bg-pink)' },
   };
 
   constructor(private apiService: ApiService) {}
@@ -59,25 +59,26 @@ export class MainComponent implements OnInit {
 
   getDirIcon(row: any): string {
     const value = (row['dir'] || '').toLowerCase();
-    if (!value || value === '-' || value === '—') return 'assets/icons/dash-icon.png';
-    if (value.includes('aus')) return 'assets/icons/arrow-icon.png';
-    if (value.includes('ein')) return 'assets/icons/arrow-icon.png';
+    if (value.includes('aus') || value.includes('ein')) {
+      return 'assets/icons/arrow-icon.png';
+    }
     return 'assets/icons/dash-icon.png';
   }
 
-  isDirLeft(row: any): boolean {
-    const value = (row['dir'] || '').toLowerCase();
-    return value.includes('ein');
-  }
-
-  isDirBlue(row: any): boolean {
+  isDirLeftBlue(row: any): boolean {
     const value = (row['dir'] || '').toLowerCase();
     return value.includes('ein');
   }
 
   getIconForType(type: any): string {
     const key = Number(type);
-    const icon = this.typeToIcon[key];
-    return icon ? `assets/icons/${icon}` : '';
+    const entry = this.typeToIconAndBg[key];
+    return entry ? `assets/icons/${entry.icon}` : '';
+  }
+
+  getBgColorForType(type: any): string {
+    const key = Number(type);
+    const entry = this.typeToIconAndBg[key];
+    return entry ? entry.bg : '#F3F3F3';
   }
 }

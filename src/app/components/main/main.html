@@ -19,17 +19,17 @@
             @for (col of visibleColumns; track col) {
             <td>
                 @if (col === 'type') {
-                <img [src]="getIconForType(row[col])" alt="type icon" class="type-icon" />
+                <div class="type-icon" [ngStyle]="{ 'background-color': getBgColorForType(row[col]) }">
+                    <img [src]="getIconForType(row[col])" alt="type icon" class="type-icon" />
+                </div>
                 }
                 @if (col === 'dir') {
-                <img [src]="getDirIcon(row)" [ngClass]="{'arrow-left': isDirLeft(row)}" alt="dir icon"
+                <img [src]="getDirIcon(row)" [ngClass]="{'arrow-left': isDirLeftBlue(row)}" alt="dir icon"
                     class="dir-icon" />
                 @if (row['dir']) {
-                <span [ngClass]="{'dir-blue': isDirBlue(row)}">
+                <span [ngClass]="{'dir-blue': isDirLeftBlue(row)}">
                     {{ row['dir'] }}
                 </span>
-                } @else {
-                <img src="assets/icons/dash-icon.svg" alt="no dir" class="dir-dash-icon" />
                 }
                 }
                 @if (col !== 'type' && col !== 'dir') {

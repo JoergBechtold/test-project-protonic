@@ -1,6 +1,15 @@
-// colors
+// Icon background colors
+$icon-bg-orange: #FFE5D0;
+$icon-bg-blue: #E3F0FF;
+$icon-bg-purple: #EDE6FB;
+$icon-bg-green: #E6F7EC;
+$icon-bg-pink: #FDE7ED;
+$icon-bg-grey: #F3F3F3;
+
 $primary-color: #ff6800;
 $background-color: #060B12;
+
+$dir-blue-color: #1976d2;
 
 $button-gradient: linear-gradient(180deg, #23313a 0%, #0e1c25 100%);
 $button-gradient-dark: linear-gradient(180deg, #18222a 0%, #0a141a 100%);
@@ -8,6 +17,15 @@ $button-gradient-dark: linear-gradient(180deg, #18222a 0%, #0a141a 100%);
 $error-color: #d32f2f;
 $input-border-color: #ccc;
 $button-text-color: #fff;
+
+:root {
+    --icon-bg-orange: #{$icon-bg-orange};
+    --icon-bg-blue: #{$icon-bg-blue};
+    --icon-bg-purple: #{$icon-bg-purple};
+    --icon-bg-green: #{$icon-bg-green};
+    --icon-bg-pink: #{$icon-bg-pink};
+    --icon-bg-grey: #{$icon-bg-grey};
+}
 
 
 body {

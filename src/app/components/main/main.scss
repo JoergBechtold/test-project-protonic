@@ -1,21 +1,29 @@
+@import '../../../styles.scss';
+
 .dir-blue {
-    color: #1976d2;
+    color: $dir-blue-color;
     font-weight: 500;
 }
 
 .type-icon {
-    width: 24px;
+    width: 32px;
     aspect-ratio: 1 / 1;
-    vertical-align: middle;
-    padding: 0.2rem;
-    border-radius: 4px;
-    background-color: rgb(243 133 133 / 82%);
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    margin: 0 auto;
+
+    img {
+        width: 24px;
+        height: 24px;
+        aspect-ratio: 1 / 1;
+        display: block;
+    }
 }
 
 .dir-icon {
     width: 16px;
     aspect-ratio: 1 / 1;
-    vertical-align: middle;
 }
 
 
