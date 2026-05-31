@@ -18,6 +18,20 @@ export class MainComponent implements OnInit {
 
   visibleColumns = ['type', 'cap subj', 'adr', 'ownr', 'start', 'prio', 'dir'];
 
+  typeToIcon: { [key: number]: string } = {
+    8: 'clipboard-icon.png',
+    7: 'megaphon-icon.png',
+    3: 'edit-icon.png',
+    2: 'calendar-icon.png',
+    0: 'mail-icon.png',
+  };
+
+  getIconForType(type: any): string {
+    const key = Number(type);
+    const icon = this.typeToIcon[key];
+    return icon ? `assets/icons/${icon}` : '';
+  }
+
   constructor(private apiService: ApiService) {}
 
   async ngOnInit(): Promise<void> {
@@ -45,7 +59,6 @@ export class MainComponent implements OnInit {
       this.rows.set([]);
       this.errorMessage.set('Es ist ein Fehler aufgetreten.');
     } finally {
-      // Das Loading-Signal wird beendet. Das Popup reagiert sauber im Template darauf.
       this.isLoading.set(false);
     }
   }

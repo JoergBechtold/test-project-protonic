@@ -17,7 +17,13 @@
         @for (row of rows(); track $index) {
         <tr>
             @for (col of visibleColumns; track col) {
-            <td>{{ row[col] }}</td>
+            <td>
+                @if (col === 'type') {
+                <img [src]="getIconForType(row[col])" alt="type icon" class="type-icon" />
+                } @else {
+                {{ row[col] }}
+                }
+            </td>
             }
         </tr>
         }
