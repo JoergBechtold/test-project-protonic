@@ -1,5 +1,28 @@
+.dir-blue {
+    color: #1976d2;
+    font-weight: 500;
+}
+
 .type-icon {
     width: 24px;
     aspect-ratio: 1 / 1;
     vertical-align: middle;
+    padding: 0.2rem;
+    border-radius: 4px;
+    background-color: rgb(243 133 133 / 82%);
+}
+
+.dir-icon {
+    width: 16px;
+    aspect-ratio: 1 / 1;
+    vertical-align: middle;
+}
+
+
+.arrow-right {
+    transform: rotate(0deg);
+}
+
+.arrow-left {
+    transform: rotate(180deg);
 }

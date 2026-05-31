@@ -26,12 +26,6 @@ export class MainComponent implements OnInit {
     0: 'mail-icon.png',
   };
 
-  getIconForType(type: any): string {
-    const key = Number(type);
-    const icon = this.typeToIcon[key];
-    return icon ? `assets/icons/${icon}` : '';
-  }
-
   constructor(private apiService: ApiService) {}
 
   async ngOnInit(): Promise<void> {
@@ -61,5 +55,29 @@ export class MainComponent implements OnInit {
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  getDirIcon(row: any): string {
+    const value = (row['dir'] || '').toLowerCase();
+    if (!value || value === '-' || value === '—') return 'assets/icons/dash-icon.png';
+    if (value.includes('aus')) return 'assets/icons/arrow-icon.png';
+    if (value.includes('ein')) return 'assets/icons/arrow-icon.png';
+    return 'assets/icons/dash-icon.png';
+  }
+
+  isDirLeft(row: any): boolean {
+    const value = (row['dir'] || '').toLowerCase();
+    return value.includes('ein');
+  }
+
+  isDirBlue(row: any): boolean {
+    const value = (row['dir'] || '').toLowerCase();
+    return value.includes('ein');
+  }
+
+  getIconForType(type: any): string {
+    const key = Number(type);
+    const icon = this.typeToIcon[key];
+    return icon ? `assets/icons/${icon}` : '';
   }
 }
