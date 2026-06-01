@@ -5,37 +5,71 @@
 <div class="main-content">
     <div class="main-content__content-area">
         <div class="main-content__header">
-            <table class="main-content__header-table">
-                <thead>
-                    <tr>
-                        <th>Typ</th>
-                        <th>Betreff</th>
-                        <th>Kontakt</th>
-                        <th>Bearbeiter</th>
-                        <th>Wann</th>
-                        <th>Prio</th>
-                        <th>Richtg.</th>
-                    </tr>
-                </thead>
-            </table>
+            <div class="main-content__header-row">
+                <div class="main-content__header-cell">Typ</div>
+                <div class="main-content__header-cell">Betreff</div>
+                <div class="main-content__header-cell">Kontakt</div>
+                <div class="main-content__header-cell">Bearbeiter</div>
+                <div class="main-content__header-cell">Wann</div>
+                <div class="main-content__header-cell">Prio</div>
+                <div class="main-content__header-cell">Richtg.</div>
+            </div>
         </div>
 
         @if (!isLoading() && errorMessage()) {
         <p class="error">{{ errorMessage() }}</p>
         }
 
-        <!-- <div class="test-box">
-            <div class="test">test</div>
-            <div class="test">test</div>
-            <div class="test">test</div>
-        </div> -->
+        <div class="ticket-row-box">
+            <div class="ticket-cell">
+                <div class="ticket-cell__status">
+                    <div class="ticket-cell__status-icon-box"><img src="assets/icons/calendar-icon.png"
+                            alt="Kalender icon"></div>
+                </div>
+                <div class="ticket-cell__reference">
+                    <div class="ticket-cell__reference-text-box">
+                        <p class="ticket-cell__reference-cap-text">Standbegehung Halle 9 - Setup Abnmahme</p>
+                        <p class="ticket-cell__reference-subj-text">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
+                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                stroke-linejoin="round">
+                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                                <circle cx="12" cy="10" r="3"></circle>
+                            </svg>Messe Hannover Halle 9
+                        </p>
+                    </div>
+                </div>
+
+                <div class="ticket-cell__contact">
+
+
+                    <div class="ticket-cell__contact-content-box">
+                        <div class="ticket-cell__contact-initials">
+                            <p>AM</p>
+                        </div>
+                        <p class="ticket-cell__contact-name">Auer Messebau &middot; 24-2327</p>
+                    </div>
+
+                </div>
+
+                <div class="ticket-cell__assignee">test</div>
+
+                <div class="ticket-cell__due-date">test</div>
+
+                <div class="ticket-cell__priority">test</div>
+
+                <div class="ticket-cell__direction">test</div>
+            </div>
+
+
+        </div>
     </div>
 
     <div class="pagination">
         <div class="pagination__left">1-6 von 42</div>
         <div class="pagination__center" aria-label="Seitennavigation">
             <button class="pagination__nav pagination__nav--prev" type="button" aria-label="Vorherige Seite">
-                <img src="assets/icons/chevron-icon.png" alt="" />
+                <img src="assets/icons/chevron-icon.png" alt="pfeil icon links" />
             </button>
             <button class="pagination__page pagination__page--active" type="button" aria-label="Seite 1">1</button>
             <button class="pagination__page" type="button" aria-label="Seite 2">2</button>
@@ -43,7 +77,7 @@
             <span class="pagination__dots" aria-hidden="true">...</span>
             <button class="pagination__page" type="button" aria-label="Seite 7">7</button>
             <button class="pagination__nav pagination__nav--next" type="button" aria-label="Nächste Seite">
-                <img src="assets/icons/chevron-icon.png" alt="" />
+                <img src="assets/icons/chevron-icon.png" alt="pfeil icon rechts" />
             </button>
         </div>
     </div>

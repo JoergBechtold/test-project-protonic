@@ -20,8 +20,8 @@ $pagination-control-color: #49515f;
 $pagination-active-bg-color: #003a59;
 $pagination-dots-color: #7d8490;
 
-
 $dir-blue-color: #1976d2;
+$initials-bg-color: #e6e9ff;
 
 $button-gradient: linear-gradient(180deg, #23313a 0%, #0e1c25 100%);
 $button-gradient-dark: linear-gradient(180deg, #18222a 0%, #0a141a 100%);
@@ -38,6 +38,16 @@ $button-text-color: #fff;
     --icon-bg-pink: #{$icon-bg-pink};
     --icon-bg-grey: #{$icon-bg-grey};
 }
+
+
+/* Shared column widths for the ticket list header and row content */
+$ticket-col-status: 80px;
+$ticket-col-reference: 28fr;
+$ticket-col-contact: 22fr;
+$ticket-col-assignee: 14fr;
+$ticket-col-due-date: 14fr;
+$ticket-col-priority: 10fr;
+$ticket-col-direction: 10fr;
 
 
 body {
