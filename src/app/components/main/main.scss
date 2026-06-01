@@ -148,7 +148,6 @@
                 margin: 0;
                 font-size: 13px;
                 font-weight: 500;
-
             }
         }
 
@@ -164,16 +163,18 @@
     &__contact-name {
         color: $background-color;
         font-weight: 500;
-
     }
 
     &__owner-name {
         color: $pagination-control-color;
-
     }
 
     &__contact-initials {
         background-color: $initials-bg-color;
+
+        p {
+            color: $dir-blue-color;
+        }
 
     }
 
