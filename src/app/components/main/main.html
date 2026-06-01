@@ -1,10 +1,54 @@
 <app-loading [visible]="isLoading()" />
 
-@if (!isLoading() && errorMessage()) {
-<p class="error">{{ errorMessage() }}</p>
-}
 
-@if (!isLoading() && !errorMessage() && rows().length > 0) {
+
+<div class="main-content">
+    <div class="main-content__content-area">
+        <div class="main-content__header">
+            <table class="main-content__header-table">
+                <thead>
+                    <tr>
+                        <th>Typ</th>
+                        <th>Betreff</th>
+                        <th>Kontakt</th>
+                        <th>Bearbeiter</th>
+                        <th>Wann</th>
+                        <th>Prio</th>
+                        <th>Richtg.</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        @if (!isLoading() && errorMessage()) {
+        <p class="error">{{ errorMessage() }}</p>
+        }
+
+        <!-- <div class="test-box">
+            <div class="test">test</div>
+            <div class="test">test</div>
+            <div class="test">test</div>
+        </div> -->
+    </div>
+
+    <div class="pagination">
+        <div class="pagination__left">1-6 von 42</div>
+        <div class="pagination__center" aria-label="Seitennavigation">
+            <button class="pagination__nav pagination__nav--prev" type="button" aria-label="Vorherige Seite">
+                <img src="assets/icons/chevron-icon.png" alt="" />
+            </button>
+            <button class="pagination__page pagination__page--active" type="button" aria-label="Seite 1">1</button>
+            <button class="pagination__page" type="button" aria-label="Seite 2">2</button>
+            <button class="pagination__page" type="button" aria-label="Seite 3">3</button>
+            <span class="pagination__dots" aria-hidden="true">...</span>
+            <button class="pagination__page" type="button" aria-label="Seite 7">7</button>
+            <button class="pagination__nav pagination__nav--next" type="button" aria-label="Nächste Seite">
+                <img src="assets/icons/chevron-icon.png" alt="" />
+            </button>
+        </div>
+    </div>
+</div>
+<!-- @if (!isLoading() && !errorMessage() && rows().length > 0) {
 <table>
     <thead>
         <tr>
@@ -41,4 +85,4 @@
         }
     </tbody>
 </table>
-}
+} -->
