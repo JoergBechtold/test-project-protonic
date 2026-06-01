@@ -124,20 +124,21 @@
         }
     }
 
-    &__contact {
+    &__contact,
+    &__owner {
         display: block;
 
         &-content-box {
             display: inline-flex;
             align-items: center;
             gap: 6px;
+            min-width: 0;
         }
 
         &-initials {
-            background-color: $initials-bg-color;
-            height: 24px;
             aspect-ratio: 1 / 1;
-            border-radius: 100%;
+            height: 26px;
+            border-radius: 50%;
             display: inline-flex;
             align-items: center;
             justify-content: center;
@@ -145,20 +146,39 @@
 
             p {
                 margin: 0;
-                line-height: 1;
-                font-size: 12px;
+                font-size: 13px;
                 font-weight: 500;
-                color: $dir-blue-color;
+
             }
         }
 
         &-name {
             margin: 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 14px;
         }
     }
 
-    &__assignee {
-        display: block;
+    &__contact-name {
+        color: $background-color;
+        font-weight: 500;
+
+    }
+
+    &__owner-name {
+        color: $pagination-control-color;
+
+    }
+
+    &__contact-initials {
+        background-color: $initials-bg-color;
+
+    }
+
+    &__owner-initials {
+        background-color: $owner-initials-bg-color;
     }
 
     &__due-date {
