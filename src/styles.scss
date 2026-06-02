@@ -32,6 +32,25 @@ $error-color: #d32f2f;
 $input-border-color: #ccc;
 $button-text-color: #fff;
 
+// Edit page color tokens
+$edit-page-title-color: #0f3044;
+$edit-page-chip-text-color: #be4e00;
+$edit-page-notice-color: #4b5563;
+$edit-page-notice-error-color: #b42318;
+$edit-page-notice-success-color: #0f766e;
+$edit-page-card-bg-color: #fcfcfd;
+$edit-page-subtle-border-color: #eceef2;
+$edit-page-heading-color: #2d3c49;
+$edit-page-label-color: #7a818d;
+$edit-page-input-border-color: #e3e7ee;
+$edit-page-input-bg-color: #f8f9fb;
+$edit-page-input-text-color: #2a3642;
+$edit-page-avatar-bg-color: #d8f5ef;
+$edit-page-avatar-text-color: #1f8d7a;
+$edit-page-name-color: #1e2b37;
+$edit-page-dt-color: #8b929d;
+$edit-page-dd-color: #34414f;
+
 :root {
     --icon-bg-orange: #{$icon-bg-orange};
     --icon-bg-blue: #{$icon-bg-blue};

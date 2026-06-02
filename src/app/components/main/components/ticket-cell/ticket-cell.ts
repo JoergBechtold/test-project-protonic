@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 
 export interface TicketCellViewModel {
   id: string;
@@ -26,4 +26,9 @@ export interface TicketCellViewModel {
 })
 export class TicketCell {
   ticket = input.required<TicketCellViewModel>();
+  ticketSelected = output<string>();
+
+  onSelect(): void {
+    this.ticketSelected.emit(this.ticket().id);
+  }
 }

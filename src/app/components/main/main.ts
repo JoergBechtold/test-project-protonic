@@ -3,6 +3,7 @@ import { ApiService } from '../../shared/services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Loading } from '../../shared/components/loading/loading';
 import { TicketCell, TicketCellViewModel } from './components/ticket-cell/ticket-cell';
+import { EditPage } from '../edit-page/edit-page';
 
 type ActivityRow = Record<string, unknown>;
 type PaginationItem = { kind: 'page'; page: number; key: string } | { kind: 'dots'; key: string };
@@ -10,7 +11,7 @@ type SubjectSortDirection = 'none' | 'asc' | 'desc';
 
 @Component({
   selector: 'app-main',
-  imports: [Loading, TicketCell],
+  imports: [Loading, TicketCell, EditPage],
   templateUrl: './main.html',
   styleUrls: ['./main.scss'],
 })
@@ -108,6 +109,8 @@ export class MainComponent implements OnInit {
   });
   isLoading = signal(true);
   errorMessage = signal('ES ist ein Fehler aufgetreten.');
+  isEditPopupOpen = signal(false);
+  selectedTicketId = signal('');
 
   private readonly typeToIconAndBg: Record<number, { icon: string; bg: string; alt: string }> = {
     8: { icon: 'clipboard-icon.png', bg: 'var(--icon-bg-orange)', alt: 'Aufgabe' },
@@ -195,6 +198,15 @@ export class MainComponent implements OnInit {
 
   canGoNext(): boolean {
     return this.totalPages() > 0 && this.activePage() < this.totalPages();
+  }
+
+  openEditPage(ticketId: string): void {
+    this.selectedTicketId.set(ticketId);
+    this.isEditPopupOpen.set(true);
+  }
+
+  closeEditPage(): void {
+    this.isEditPopupOpen.set(false);
   }
 
   private extractRows(data: unknown): ActivityRow[] {

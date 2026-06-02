@@ -1,5 +1,18 @@
 <app-loading [visible]="isLoading()" />
 
+@if (isEditPopupOpen()) {
+<div class="edit-popup-overlay" (click)="closeEditPage()" aria-hidden="true"></div>
+<section class="edit-popup" role="dialog" aria-modal="true" aria-label="Ticket bearbeiten">
+    <header class="edit-popup__header">
+        <h2 class="edit-popup__title">Ticket {{ selectedTicketId() }}</h2>
+        <button class="edit-popup__close" type="button" (click)="closeEditPage()"
+            aria-label="Popup schließen">×</button>
+    </header>
+    <div class="edit-popup__content">
+        <app-edit-page [activityId]="selectedTicketId()"></app-edit-page>
+    </div>
+</section>
+}
 
 
 <div class="main-content">
@@ -32,7 +45,7 @@
         <div class="ticket-row-box">
             @if (!isLoading() && !errorMessage()) {
             @for (ticket of pagedTicketRows(); track ticket.id) {
-            <app-ticket-cell [ticket]="ticket"></app-ticket-cell>
+            <app-ticket-cell [ticket]="ticket" (ticketSelected)="openEditPage($event)"></app-ticket-cell>
             }
             }
         </div>

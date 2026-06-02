@@ -1,0 +1,98 @@
+<form class="edit-page" [formGroup]="form" (ngSubmit)="save()">
+    <app-loading [visible]="isLoadingFormdata()"></app-loading>
+    <app-popup [trigger]="showSavePopup()">Änderungen wurden gespeichert</app-popup>
+
+    <header class="edit-page__top">
+        <h1 class="edit-page__title">Bestellung · Detailansicht</h1>
+        <button class="edit-page__save" type="submit" [disabled]="isSaving()">
+            {{ isSaving() ? 'Speichere...' : 'Speichern' }}
+        </button>
+    </header>
+
+    <div class="edit-page__chip-row">
+        <p class="edit-page__chip">Aktivität</p>
+    </div>
+
+    <div class="edit-page__status">
+        @if (loadError()) {
+        <p class="edit-page__notice edit-page__notice--error">{{ loadError() }}</p>
+        } @else if (saveError()) {
+        <p class="edit-page__notice edit-page__notice--error">{{ saveError() }}</p>
+        } @else {
+        <p class="edit-page__notice edit-page__notice--placeholder">&nbsp;</p>
+        }
+    </div>
+
+    <div class="edit-page__layout edit-page__layout--single">
+        <article class="detail-card detail-card--activity">
+            <header class="detail-card__header">
+                <h2>Aktivitätsdaten</h2>
+            </header>
+
+            <div class="activity-grid">
+                <div class="activity-row">
+                    <p class="activity-row__label">Aktivitätstyp</p>
+                    <div class="activity-row__value">
+                        <select class="field__select" formControlName="activityType">
+                            <option>E-Mail</option>
+                            <option>Telefon</option>
+                            <option>Termin</option>
+                            <option>Aufgabe</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="activity-row">
+                    <p class="activity-row__label">Bezeichnung</p>
+                    <div class="activity-row__value">
+                        <input type="text" formControlName="caption" />
+                    </div>
+                </div>
+
+                <div class="activity-row">
+                    <p class="activity-row__label">Startdatum</p>
+                    <div class="activity-row__value activity-row__value--datetime">
+                        <input type="text" formControlName="startDate" placeholder="TT.MM.JJJJ" />
+                        <input type="text" formControlName="startTime" placeholder="HH:MM" />
+                    </div>
+                </div>
+
+                <div class="activity-row">
+                    <p class="activity-row__label">Enddatum</p>
+                    <div class="activity-row__value activity-row__value--datetime">
+                        <input type="text" formControlName="endDate" placeholder="TT.MM.JJJJ" />
+                        <input type="text" formControlName="endTime" placeholder="HH:MM" />
+                    </div>
+                </div>
+
+                <div class="activity-row">
+                    <p class="activity-row__label">Bearbeiter</p>
+                    <div class="activity-row__value">
+                        <select class="field__select" formControlName="assignee">
+                            <option value="">Auswaehlen</option>
+                            <option>dbdb</option>
+                            <option>Patrick Fischer</option>
+                            <option>Julia Wagner</option>
+                            <option>Timo Hoffmann</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="activity-row activity-row--address">
+                    <p class="activity-row__label">Adresse</p>
+                    <div class="activity-row__value">
+                        <textarea rows="4" formControlName="address"></textarea>
+                        <button class="activity-edit-btn" type="button">Bearbeiten</button>
+                    </div>
+                </div>
+
+                <div class="activity-row">
+                    <p class="activity-row__label">Erledigt</p>
+                    <div class="activity-row__value activity-row__value--check">
+                        <input type="checkbox" formControlName="finalized" />
+                    </div>
+                </div>
+            </div>
+        </article>
+    </div>
+</form>

@@ -1,4 +1,4 @@
-<div class="ticket-cell">
+<div class="ticket-cell" (click)="onSelect()">
     <div class="ticket-cell__status">
         <div class="ticket-cell__status-icon-box" [style.background-color]="ticket().typeBgColor">
             <img [src]="ticket().typeIconSrc" [alt]="ticket().typeIconAlt" width="24" height="24" />
