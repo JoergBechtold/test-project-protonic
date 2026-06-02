@@ -183,15 +183,107 @@
     }
 
     &__due-date {
-        display: block;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+
+        p {
+            margin: 0;
+        }
+
+        &-day {
+            color: $background-color;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        &-time {
+            color: $pagination-text-color;
+            font-size: 12px;
+            font-weight: 400;
+        }
     }
 
     &__priority {
-        display: block;
+        display: flex;
+        align-items: center;
+
+        &-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        &-label {
+            margin: 0;
+            color: $pagination-control-color;
+            font-size: 14px;
+            font-weight: 600;
+        }
     }
 
     &__direction {
-        display: block;
+        display: flex;
+        align-items: center;
+
+        &-content {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            width: 100%;
+        }
+
+        &-icon {
+            margin: 0;
+            width: 14px;
+            height: 14px;
+            object-fit: contain;
+            display: block;
+        }
+
+        &-label {
+            margin: 0;
+            color: $pagination-control-color;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        &-chevron {
+            margin-left: auto;
+            aspect-ratio: 1 / 1;
+            height: 10px;
+            object-fit: contain;
+            display: block;
+            opacity: 0.7;
+        }
+    }
+}
+
+.priority-bars {
+    display: inline-flex;
+    align-items: flex-end;
+    gap: 2px;
+    height: 14px;
+
+    &__bar {
+        margin: 0;
+        width: 3px;
+        border-radius: 2px 2px 0 0;
+        background-color: $primary-color;
+
+        &--1 {
+            height: 6px;
+            opacity: 0.55;
+        }
+
+        &--2 {
+            height: 9px;
+            opacity: 0.8;
+        }
+
+        &--3 {
+            height: 12px;
+        }
     }
 }
 
