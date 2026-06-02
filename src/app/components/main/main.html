@@ -21,129 +21,43 @@
         }
 
         <div class="ticket-row-box">
-            <div class="ticket-cell">
-                <div class="ticket-cell__status">
-                    <div class="ticket-cell__status-icon-box"><img src="assets/icons/calendar-icon.png"
-                            alt="Kalender icon"></div>
-                </div>
-                <div class="ticket-cell__reference">
-                    <div class="ticket-cell__reference-text-box">
-                        <p class="ticket-cell__reference-cap-text">Standbegehung Halle 9 - Setup Abnmahme</p>
-                        <p class="ticket-cell__reference-subj-text">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24"
-                                fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                stroke-linejoin="round">
-                                <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                                <circle cx="12" cy="10" r="3"></circle>
-                            </svg>Messe Hannover Halle 9
-                        </p>
-                    </div>
-                </div>
-
-                <div class="ticket-cell__contact">
-
-
-                    <div class="ticket-cell__contact-content-box">
-                        <div class="ticket-cell__contact-initials">
-                            <p>AM</p>
-                        </div>
-                        <p class="ticket-cell__contact-name">Auer Messebau &middot; 24-2327</p>
-                    </div>
-
-                </div>
-
-                <div class="ticket-cell__owner">
-                    <div class="ticket-cell__owner-content-box">
-                        <div class="ticket-cell__owner-initials">
-                            <p>JN</p>
-                        </div>
-                        <p class="ticket-cell__owner-name">Johannes</p>
-                    </div>
-                </div>
-
-                <div class="ticket-cell__due-date">
-                    <p class="ticket-cell__due-date-day">Heute</p>
-                    <p class="ticket-cell__due-date-time">08:00 - 11:30</p>
-                </div>
-
-                <div class="ticket-cell__priority">
-                    <div class="ticket-cell__priority-content">
-                        <div class="priority-bars">
-                            <p class="priority-bars__bar priority-bars__bar--1"></p>
-                            <p class="priority-bars__bar priority-bars__bar--2"></p>
-                            <p class="priority-bars__bar priority-bars__bar--3"></p>
-                        </div>
-                        <p class="ticket-cell__priority-label">Hoch</p>
-                    </div>
-                </div>
-
-                <div class="ticket-cell__direction">
-                    <div class="ticket-cell__direction-content">
-                        <img class="ticket-cell__direction-icon" src="assets/icons/arrow-icon.png"
-                            alt="Richtungspfeil" />
-                        <p class="ticket-cell__direction-label">Aus</p>
-                        <img class="ticket-cell__direction-chevron" src="assets/icons/chevron-icon.png"
-                            alt="Mehr anzeigen" />
-                    </div>
-                </div>
-            </div>
-
-
+            @if (!isLoading() && !errorMessage()) {
+            @for (ticket of pagedTicketRows(); track ticket.id) {
+            <app-ticket-cell [ticket]="ticket"></app-ticket-cell>
+            }
+            }
         </div>
     </div>
 
     <div class="pagination">
-        <div class="pagination__left">1-6 von 42</div>
+        <div class="pagination__left">{{ pageRangeLabel() }}</div>
         <div class="pagination__center">
-            <button class="pagination__nav pagination__nav--prev" type="button">
-                <img src="assets/icons/chevron-icon.png" alt="pfeil icon links" />
+            <div class="pagination__nav-slot" aria-hidden="true">
+                @if (canGoPrevious()) {
+                <button class="pagination__nav pagination__nav--prev" type="button" (click)="goToPreviousPage()">
+                    <img class="pagination__nav-icon" src="assets/icons/chevron-icon.png" alt="pfeil icon links" />
+                </button>
+                }
+            </div>
+
+            @for (item of paginationItems(); track item.key) {
+            @if (item.kind === 'page') {
+            <button class="pagination__page" [class.pagination__page--active]="item.page === activePage()" type="button"
+                (click)="goToPage(item.page)">
+                {{ item.page }}
             </button>
-            <button class="pagination__page pagination__page--active" type="button">1</button>
-            <button class="pagination__page" type="button">2</button>
-            <button class="pagination__page" type="button">3</button>
+            } @else {
             <span class="pagination__dots">...</span>
-            <button class="pagination__page" type="button">7</button>
-            <button class="pagination__nav pagination__nav--next" type="button">
-                <img src="assets/icons/chevron-icon.png" alt="pfeil icon rechts" />
-            </button>
+            }
+            }
+
+            <div class="pagination__nav-slot" aria-hidden="true">
+                @if (canGoNext()) {
+                <button class="pagination__nav pagination__nav--next" type="button" (click)="goToNextPage()">
+                    <img class="pagination__nav-icon" src="assets/icons/chevron-icon.png" alt="pfeil icon rechts" />
+                </button>
+                }
+            </div>
         </div>
     </div>
 </div>
-<!-- @if (!isLoading() && !errorMessage() && rows().length > 0) {
-<table>
-    <thead>
-        <tr>
-            @for (col of visibleColumns; track col) {
-            <th>{{ col }}</th>
-            }
-        </tr>
-    </thead>
-    <tbody>
-        @for (row of rows(); track $index) {
-        <tr>
-            @for (col of visibleColumns; track col) {
-            <td>
-                @if (col === 'type') {
-                <div class="type-icon" [ngStyle]="{ 'background-color': getBgColorForType(row[col]) }">
-                    <img [src]="getIconForType(row[col])" alt="type icon" class="type-icon" />
-                </div>
-                }
-                @if (col === 'dir') {
-                <img [src]="getDirIcon(row)" [ngClass]="{'arrow-left': isDirLeftBlue(row)}" alt="dir icon"
-                    class="dir-icon" />
-                @if (row['dir']) {
-                <span [ngClass]="{'dir-blue': isDirLeftBlue(row)}">
-                    {{ row['dir'] }}
-                </span>
-                }
-                }
-                @if (col !== 'type' && col !== 'dir') {
-                {{ row[col] }}
-                }
-            </td>
-            }
-        </tr>
-        }
-    </tbody>
-</table>
-} -->

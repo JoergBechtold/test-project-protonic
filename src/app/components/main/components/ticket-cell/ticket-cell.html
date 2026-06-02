@@ -1,0 +1,67 @@
+<div class="ticket-cell">
+    <div class="ticket-cell__status">
+        <div class="ticket-cell__status-icon-box" [style.background-color]="ticket().typeBgColor">
+            <img [src]="ticket().typeIconSrc" [alt]="ticket().typeIconAlt" width="24" height="24" />
+        </div>
+    </div>
+
+    <div class="ticket-cell__reference">
+        <div class="ticket-cell__reference-text-box">
+            <p class="ticket-cell__reference-cap-text">{{ ticket().title }}</p>
+            <p class="ticket-cell__reference-subj-text">
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                    aria-hidden="true">
+                    <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
+                    <circle cx="12" cy="10" r="3"></circle>
+                </svg>
+                <span class="ticket-cell__reference-subj-text-content">{{ ticket().location }}</span>
+            </p>
+        </div>
+    </div>
+
+    <div class="ticket-cell__contact">
+        <div class="ticket-cell__contact-content-box">
+            <div class="ticket-cell__contact-initials">
+                <p>{{ ticket().contactInitials }}</p>
+            </div>
+            <p class="ticket-cell__contact-name">{{ ticket().contactName }}</p>
+        </div>
+    </div>
+
+    <div class="ticket-cell__owner">
+        <div class="ticket-cell__owner-content-box">
+            <div class="ticket-cell__owner-initials">
+                <p>{{ ticket().ownerInitials }}</p>
+            </div>
+            <p class="ticket-cell__owner-name">{{ ticket().ownerName }}</p>
+        </div>
+    </div>
+
+    <div class="ticket-cell__due-date">
+        <p class="ticket-cell__due-date-day">{{ ticket().dueDay }}</p>
+        <p class="ticket-cell__due-date-time">{{ ticket().dueTime }}</p>
+    </div>
+
+    <div class="ticket-cell__priority">
+        <div class="ticket-cell__priority-content">
+            <div class="priority-bars" aria-hidden="true">
+                <p class="priority-bars__bar priority-bars__bar--1"></p>
+                <p class="priority-bars__bar priority-bars__bar--2"></p>
+                <p class="priority-bars__bar priority-bars__bar--3"></p>
+            </div>
+            <p class="ticket-cell__priority-label">{{ ticket().priorityLabel }}</p>
+        </div>
+    </div>
+
+    <div class="ticket-cell__direction">
+        <div class="ticket-cell__direction-content">
+            <img class="ticket-cell__direction-icon" src="assets/icons/arrow-icon.png" width="14" height="14"
+                alt="Richtungspfeil" [class.arrow-left]="ticket().directionArrowLeft" />
+            <p class="ticket-cell__direction-label" [class.dir-blue]="ticket().directionArrowLeft">{{
+                ticket().directionLabel }}</p>
+            <img class="ticket-cell__direction-chevron" src="assets/icons/chevron-icon.png" width="10" height="10"
+                alt="Mehr anzeigen" />
+        </div>
+    </div>
+</div>
