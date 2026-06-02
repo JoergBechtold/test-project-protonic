@@ -1,7 +1,9 @@
+@import '../../../../styles.scss';
+
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(15, 15, 25, 0.75);
+    background: $loading-overlay-bg-color;
     backdrop-filter: blur(4px);
     display: flex;
     flex-direction: column;
@@ -12,14 +14,14 @@
 }
 
 .spinner {
-    width: 56px;
+    aspect-ratio: 1;
     height: 56px;
     border-radius: 50%;
     border: 4px solid transparent;
-    border-top-color: #6c63ff;
-    border-right-color: #6c63ff;
+    border-top-color: $loading-spinner-color;
+    border-right-color: $loading-spinner-color;
     animation: spin 0.75s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-    box-shadow: 0 0 20px rgba(108, 99, 255, 0.4);
+    box-shadow: 0 0 20px $loading-spinner-shadow-color;
 }
 
 .spinner::before {
@@ -28,12 +30,12 @@
     inset: 6px;
     border-radius: 50%;
     border: 4px solid transparent;
-    border-bottom-color: rgba(108, 99, 255, 0.3);
+    border-bottom-color: $loading-spinner-inner-color;
     animation: spin 1.5s linear infinite reverse;
 }
 
 .loading-text {
-    color: rgba(255, 255, 255, 0.8);
+    color: $loading-text-color;
     font-size: 0.9rem;
     letter-spacing: 0.15em;
     text-transform: uppercase;
