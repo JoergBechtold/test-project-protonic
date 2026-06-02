@@ -23,7 +23,7 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
-            "assets": ["src/assets", "src/favicon.ico"],
+            "assets": ["src/assets", "public/favicon.ico"],
             "styles": ["src/styles.scss"]
           },
           "configurations": {

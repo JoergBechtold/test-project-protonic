@@ -58,6 +58,27 @@
     text-transform: uppercase;
 }
 
+.main-content__sort-button {
+    border: 0;
+    background: transparent;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: inherit;
+    font: inherit;
+    text-transform: inherit;
+    cursor: pointer;
+
+    &--active {
+        color: $background-color;
+    }
+}
+
+.main-content__sort-indicator {
+    font-size: 12px;
+}
+
 .ticket-row-box {
     flex: 1;
     min-height: 0;

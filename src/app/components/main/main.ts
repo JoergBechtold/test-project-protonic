@@ -6,6 +6,7 @@ import { TicketCell, TicketCellViewModel } from './components/ticket-cell/ticket
 
 type ActivityRow = Record<string, unknown>;
 type PaginationItem = { kind: 'page'; page: number; key: string } | { kind: 'dots'; key: string };
+type SubjectSortDirection = 'none' | 'asc' | 'desc';
 
 @Component({
   selector: 'app-main',
@@ -21,8 +22,24 @@ export class MainComponent implements OnInit {
   ticketRows = computed<TicketCellViewModel[]>(() =>
     this.rows().map((row, index) => this.toTicketRow(row, index)),
   );
+  subjectSortDirection = signal<SubjectSortDirection>('none');
+  sortedTicketRows = computed<TicketCellViewModel[]>(() => {
+    const direction = this.subjectSortDirection();
+    const tickets = [...this.ticketRows()];
+
+    if (direction === 'none') {
+      return tickets;
+    }
+
+    tickets.sort((left, right) => {
+      const comparison = left.title.localeCompare(right.title, 'de', { sensitivity: 'base' });
+      return direction === 'asc' ? comparison : comparison * -1;
+    });
+
+    return tickets;
+  });
   currentPage = signal(1);
-  totalItems = computed(() => this.ticketRows().length);
+  totalItems = computed(() => this.sortedTicketRows().length);
   totalPages = computed(() => Math.ceil(this.totalItems() / this.pageSize));
   activePage = computed(() => {
     const totalPages = this.totalPages();
@@ -44,7 +61,7 @@ export class MainComponent implements OnInit {
   pagedTicketRows = computed<TicketCellViewModel[]>(() => {
     const start = (this.activePage() - 1) * this.pageSize;
     const end = start + this.pageSize;
-    return this.ticketRows().slice(start, end);
+    return this.sortedTicketRows().slice(start, end);
   });
   pageRangeLabel = computed(() => {
     const totalItems = this.totalItems();
@@ -153,6 +170,15 @@ export class MainComponent implements OnInit {
 
     const nextPage = Math.min(Math.max(page, 1), totalPages);
     this.currentPage.set(nextPage);
+  }
+
+  toggleSubjectSort(): void {
+    const currentDirection = this.subjectSortDirection();
+    const nextDirection: SubjectSortDirection =
+      currentDirection === 'none' ? 'asc' : currentDirection === 'asc' ? 'desc' : 'asc';
+
+    this.subjectSortDirection.set(nextDirection);
+    this.currentPage.set(1);
   }
 
   goToPreviousPage(): void {

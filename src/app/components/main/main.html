@@ -7,7 +7,16 @@
         <div class="main-content__header">
             <div class="main-content__header-row">
                 <div class="main-content__header-cell">Typ</div>
-                <div class="main-content__header-cell">Betreff</div>
+                <div class="main-content__header-cell">
+                    <button class="main-content__sort-button" type="button" (click)="toggleSubjectSort()"
+                        [class.main-content__sort-button--active]="subjectSortDirection() !== 'none'">
+                        <span>Betreff</span>
+                        <span class="main-content__sort-indicator">
+                            {{ subjectSortDirection() === 'none' ? '↕' : subjectSortDirection() === 'desc' ? '↓' : '↑'
+                            }}
+                        </span>
+                    </button>
+                </div>
                 <div class="main-content__header-cell">Kontakt</div>
                 <div class="main-content__header-cell">Bearbeiter</div>
                 <div class="main-content__header-cell">Wann</div>
