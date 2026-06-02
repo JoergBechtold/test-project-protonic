@@ -3,7 +3,7 @@
 .loading-overlay {
     position: fixed;
     inset: 0;
-    background: $loading-overlay-bg-color;
+    background: $background-color;
     backdrop-filter: blur(4px);
     display: flex;
     flex-direction: column;
