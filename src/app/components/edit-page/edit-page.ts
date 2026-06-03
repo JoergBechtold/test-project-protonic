@@ -33,8 +33,12 @@ export class EditPage {
   readonly saveMessage = signal('');
   readonly saveError = signal('');
   readonly closeRequested = output<void>();
+  readonly closed = output<void>();
   readonly currentActivityId = signal<number | null>(null);
   private readonly loadedFormdata = signal<Record<string, unknown> | null>(null);
+  readonly activityTypes = signal<any[]>([]);
+  readonly users = signal<any[]>([]);
+  readonly addressData = signal<any>(null);
 
   readonly form = this.formBuilder.nonNullable.group({
     activityType: 'E-Mail',
@@ -63,6 +67,10 @@ export class EditPage {
     event.preventDefault();
     event.stopPropagation();
     void this.save();
+  }
+
+  onClose(): void {
+    this.closed.emit();
   }
 
   async save(): Promise<void> {
@@ -95,29 +103,39 @@ export class EditPage {
     this.saveError.set('');
 
     try {
-      const formdata = await firstValueFrom(this.apiService.getActivityFormdata(activityId));
+      const [details, formdata] = await this.apiService.getActivityDetailsAndFormdata(activityId);
+      const safeDetails = this.asRecord(details);
       const safeFormdata = this.asRecord(formdata);
 
       this.loadedFormdata.set(safeFormdata);
       this.currentActivityId.set(activityId);
 
+      const combinedData = { ...safeDetails, ...safeFormdata };
+
+      // Store dropdown options and address data
+      this.activityTypes.set(
+        Array.isArray(combinedData['ActivityTypes']) ? combinedData['ActivityTypes'] : [],
+      );
+      this.users.set(Array.isArray(combinedData['Users']) ? combinedData['Users'] : []);
+      this.addressData.set(combinedData['Address'] || null);
+
+      // Parse dates (API format: "2020-10-07T10:00:00.0000000")
+      const startDateParsed = this.parseDateTime(combinedData['StartDate']);
+      const endDateParsed = this.parseDateTime(combinedData['EndDate']);
+
+      // Format address object to text
+      const addressText = this.formatAddress(combinedData['Address']);
+
       this.form.patchValue({
-        activityType: this.asText(
-          this.pickValue(safeFormdata, ['activityType', 'activityTyp', 'type']),
-          'E-Mail',
-        ),
-        caption: this.asText(
-          this.pickValue(safeFormdata, ['cap subj', 'subject', 'caption', 'description']),
-        ),
-        startDate: this.asText(this.pickValue(safeFormdata, ['startDate', 'begda'])),
-        startTime: this.asText(this.pickValue(safeFormdata, ['startTime', 'begti'])),
-        endDate: this.asText(this.pickValue(safeFormdata, ['endDate', 'endda'])),
-        endTime: this.asText(this.pickValue(safeFormdata, ['endTime', 'endti'])),
-        assignee: this.asText(this.pickValue(safeFormdata, ['assignee', 'processor', 'ownr'])),
-        address: this.asText(
-          this.pickValue(safeFormdata, ['address', 'adr', 'location', 'addressText']),
-        ),
-        finalized: this.asBool(this.pickValue(safeFormdata, ['finalized', 'done', 'isDone'])),
+        activityType: this.asText(combinedData['ActivityType'], 'E-Mail'),
+        caption: this.asText(combinedData['Caption']),
+        startDate: startDateParsed.date,
+        startTime: startDateParsed.time,
+        endDate: endDateParsed.date,
+        endTime: endDateParsed.time,
+        assignee: this.asText(combinedData['User']),
+        address: addressText,
+        finalized: this.asBool(combinedData['Finalized']),
       });
     } catch (error) {
       console.error('Fehler beim Laden der Formulardaten:', error);
@@ -199,6 +217,60 @@ export class EditPage {
     }
 
     return false;
+  }
+
+  private parseDateTime(value: unknown): { date: string; time: string } {
+    if (!value || typeof value !== 'string') {
+      return { date: '', time: '' };
+    }
+
+    try {
+      // API format: "2020-10-07T10:00:00.0000000"
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return { date: '', time: '' };
+      }
+
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+
+      return {
+        date: `${day}.${month}.${year}`,
+        time: `${hours}:${minutes}`,
+      };
+    } catch {
+      return { date: '', time: '' };
+    }
+  }
+
+  private formatAddress(address: unknown): string {
+    if (!address || typeof address !== 'object') {
+      return '';
+    }
+
+    const addr = address as Record<string, unknown>;
+    const parts: string[] = [];
+
+    if (addr['Company']) parts.push(String(addr['Company']));
+    if (addr['FirstName'] || addr['Surname']) {
+      const name = [addr['FirstName'], addr['Surname']].filter(Boolean).join(' ');
+      if (name) parts.push(name);
+    }
+    if (addr['Street']) parts.push(String(addr['Street']));
+    if (addr['Zip'] || addr['City']) {
+      const location = [addr['Zip'], addr['City']].filter(Boolean).join(' ');
+      if (location) parts.push(location);
+    }
+    // Country is an object with Caption property
+    if (addr['Country'] && typeof addr['Country'] === 'object') {
+      const country = addr['Country'] as Record<string, unknown>;
+      if (country['Caption']) parts.push(String(country['Caption']));
+    }
+
+    return parts.join('\n');
   }
 
   private buildSaveErrorMessage(error: unknown): string {

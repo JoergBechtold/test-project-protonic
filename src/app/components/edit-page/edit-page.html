@@ -1,132 +1,161 @@
-<form class="edit-page" [formGroup]="form" (ngSubmit)="onSaveSubmit($event)">
-    <app-loading [visible]="isLoadingFormdata()"></app-loading>
-
-    <header class="edit-page__top">
-        <h1 class="edit-page__title">Bestellung · Detailansicht</h1>
-        <button class="edit-page__save" type="submit" [disabled]="isSaving()">
-            {{ isSaving() ? 'Speichere...' : 'Speichern' }}
-        </button>
+<div class="edit-page-overlay" (click)="onClose()"></div>
+<section class="edit-page-popup" role="dialog" aria-modal="true">
+    <header class="edit-page-popup__header">
+        <h2 class="edit-page-popup__title">Bestellung · Detailansicht</h2>
+        <div class="edit-page-popup__actions">
+            <button class="edit-page-popup__close" type="button" (click)="onClose()">
+                <img src="../../assets/icons/close-icon.png" alt="Schließen">
+            </button>
+        </div>
     </header>
+    <div class="edit-page-popup__content">
+        <form class="edit-page" [formGroup]="form">
+            <app-loading [visible]="isLoadingFormdata()"></app-loading>
 
-    <div class="edit-page__chip-row">
-        <p class="edit-page__chip">Aktivität</p>
-    </div>
-
-    <div class="edit-page__status">
-        @if (loadError()) {
-        <p class="edit-page__notice edit-page__notice--error">{{ loadError() }}</p>
-        } @else if (saveError()) {
-        <p class="edit-page__notice edit-page__notice--error">{{ saveError() }}</p>
-        } @else {
-        <p class="edit-page__notice edit-page__notice--placeholder">&nbsp;</p>
-        }
-    </div>
-
-    <div class="edit-page__layout">
-        <article class="detail-card detail-card--activity">
-            <header class="detail-card__header">
-                <h2>Aktivitätsdaten</h2>
-            </header>
-
-            <div class="activity-grid">
-                <div class="activity-row">
-                    <p class="activity-row__label">Aktivitätstyp</p>
-                    <div class="activity-row__value">
-                        <select class="field__select" formControlName="activityType">
-                            <option>E-Mail</option>
-                            <option>Telefon</option>
-                            <option>Termin</option>
-                            <option>Aufgabe</option>
-                        </select>
-                    </div>
+            <div class="edit-page__chip-row">
+                <div class="edit-page__chip">
+                    <img src="../../assets/icons/head-icon.png" alt="Kopf Icon">
+                    <span>Kopfdaten</span>
                 </div>
-
-                <div class="activity-row">
-                    <p class="activity-row__label">Bezeichnung</p>
-                    <div class="activity-row__value">
-                        <input type="text" formControlName="caption" />
-                    </div>
-                </div>
-
-                <div class="activity-row">
-                    <p class="activity-row__label">Startdatum</p>
-                    <div class="activity-row__value activity-row__value--datetime">
-                        <input type="text" formControlName="startDate" placeholder="TT.MM.JJJJ" />
-                        <input type="text" formControlName="startTime" placeholder="HH:MM" />
-                    </div>
-                </div>
-
-                <div class="activity-row">
-                    <p class="activity-row__label">Enddatum</p>
-                    <div class="activity-row__value activity-row__value--datetime">
-                        <input type="text" formControlName="endDate" placeholder="TT.MM.JJJJ" />
-                        <input type="text" formControlName="endTime" placeholder="HH:MM" />
-                    </div>
-                </div>
-
-                <div class="activity-row">
-                    <p class="activity-row__label">Bearbeiter</p>
-                    <div class="activity-row__value">
-                        <select class="field__select" formControlName="assignee">
-                            <option value="">Auswählen</option>
-                            <option>dbdb</option>
-                            <option>Patrick Fischer</option>
-                            <option>Julia Wagner</option>
-                            <option>Timo Hoffmann</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="activity-row activity-row--address">
-                    <p class="activity-row__label">Adresse</p>
-                    <div class="activity-row__value">
-                        <textarea rows="4" formControlName="address"></textarea>
-                        <button class="activity-edit-btn" type="button">Bearbeiten</button>
-                    </div>
-                </div>
-
-                <div class="activity-row">
-                    <p class="activity-row__label">Erledigt</p>
-                    <div class="activity-row__value activity-row__value--check">
-                        <input type="checkbox" formControlName="finalized" />
-                    </div>
-                </div>
+                <button class="edit-page__save" type="button" (click)="onSaveSubmit($event)" [disabled]="isSaving()">
+                    <img src="../../assets/icons/check-icon.png" alt="">
+                    <span>{{ isSaving() ? 'Speichere...' : 'Speichern' }}</span>
+                </button>
             </div>
-        </article>
 
-        <aside class="detail-card detail-card--supplier">
-            <div class="supplier-card">
-                <div class="supplier-card__head">
-                    <div class="supplier-card__avatar">AH</div>
-                    <div>
-                        <p class="supplier-card__name">Adam Hall GmbH</p>
-                        <p class="supplier-card__meta">Lieferant · LF-218</p>
-                    </div>
-                </div>
-
-                <div class="supplier-card__rows">
-                    <div class="supplier-card__row">
-                        <span>Telefon</span>
-                        <strong>+49 6081 9419-0</strong>
-                    </div>
-                    <div class="supplier-card__row">
-                        <span>E-Mail</span>
-                        <strong>einkauf@adamhall.com</strong>
-                    </div>
-                    <div class="supplier-card__row supplier-card__row--multiline">
-                        <span>Adresse</span>
-                        <strong>Daimlerstraße 9,<br />61267 Neu-Anspach, DE</strong>
-                    </div>
-                    <div class="supplier-card__row">
-                        <span>UST-ID</span>
-                        <strong>DE 812 345 678</strong>
-                    </div>
-                    <div class="supplier-card__row">
-                        <span>Kreditor</span>
-                        <strong>70218</strong>
-                    </div>
-                </div>
+            <div class="edit-page__status">
+                @if (loadError()) {
+                <p class="edit-page__notice edit-page__notice--error">{{ loadError() }}</p>
+                } @else if (saveError()) {
+                <p class="edit-page__notice edit-page__notice--error">{{ saveError() }}</p>
+                } @else {
+                <p class="edit-page__notice edit-page__notice--placeholder">&nbsp;</p>
+                }
             </div>
-        </aside>
+
+            <div class="edit-page__layout">
+                <article class="detail-card detail-card--activity">
+                    <header class="detail-card__header">
+                        <h2>Aktivitätsdaten</h2>
+                    </header>
+
+                    <div class="activity-grid">
+                        <div class="activity-row">
+                            <p class="activity-row__label">Aktivitätstyp</p>
+                            <div class="activity-row__value">
+                                <select class="field__select" formControlName="activityType">
+                                    @for (type of activityTypes(); track type.IdActivityType) {
+                                    <option [value]="type.Caption">{{ type.Caption }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="activity-row">
+                            <p class="activity-row__label">Bezeichnung</p>
+                            <div class="activity-row__value">
+                                <input type="text" formControlName="caption" />
+                            </div>
+                        </div>
+
+                        <div class="activity-row">
+                            <p class="activity-row__label">Startdatum</p>
+                            <div class="activity-row__value activity-row__value--datetime">
+                                <input type="text" formControlName="startDate" placeholder="TT.MM.JJJJ" />
+                                <input type="text" formControlName="startTime" placeholder="HH:MM" />
+                            </div>
+                        </div>
+
+                        <div class="activity-row">
+                            <p class="activity-row__label">Enddatum</p>
+                            <div class="activity-row__value activity-row__value--datetime">
+                                <input type="text" formControlName="endDate" placeholder="TT.MM.JJJJ" />
+                                <input type="text" formControlName="endTime" placeholder="HH:MM" />
+                            </div>
+                        </div>
+
+                        <div class="activity-row">
+                            <p class="activity-row__label">Bearbeiter</p>
+                            <div class="activity-row__value">
+                                <select class="field__select" formControlName="assignee">
+                                    <option value="">Auswählen</option>
+                                    @for (user of users(); track user.IdUser) {
+                                    <option [value]="user.Caption">{{ user.Caption }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="activity-row activity-row--address">
+                            <p class="activity-row__label">Adresse</p>
+                            <div class="activity-row__value">
+                                <textarea rows="4" formControlName="address"></textarea>
+                                <button class="activity-edit-btn" type="button">Bearbeiten</button>
+                            </div>
+                        </div>
+
+                        <div class="activity-row">
+                            <p class="activity-row__label">Erledigt</p>
+                            <div class="activity-row__value activity-row__value--check">
+                                <input type="checkbox" formControlName="finalized" />
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <aside class="detail-card detail-card--supplier">
+                    @if (addressData(); as addr) {
+                    <div class="supplier-card">
+                        <div class="supplier-card__head">
+                            <div class="supplier-card__avatar">{{ addr.Company ? addr.Company.substring(0,
+                                2).toUpperCase() :
+                                'NA' }}</div>
+                            <div>
+                                <p class="supplier-card__name">{{ addr.Company || 'N/A' }}</p>
+                                <p class="supplier-card__meta">Adresse · {{ addr.Number || 'N/A' }}</p>
+                            </div>
+                        </div>
+
+                        <div class="supplier-card__rows">
+                            @if (addr.Phone) {
+                            <div class="supplier-card__row">
+                                <p>Telefon</p>
+                                <strong>{{ addr.Phone }}</strong>
+                            </div>
+                            }
+                            @if (addr.EMail) {
+                            <div class="supplier-card__row">
+                                <p>E-Mail</p>
+                                <strong>{{ addr.EMail }}</strong>
+                            </div>
+                            }
+                            @if (addr.Street || addr.Zip || addr.City) {
+                            <div class="supplier-card__row supplier-card__row--multiline">
+                                <p>Adresse</p>
+                                <strong>
+                                    {{ addr.Street }}<br />
+                                    {{ addr.Zip }} {{ addr.City }}{{ addr.Country?.Caption ? ', ' + addr.Country.Caption
+                                    : '' }}
+                                </strong>
+                            </div>
+                            }
+                            @if (addr.VATID) {
+                            <div class="supplier-card__row">
+                                <p>UST-ID</p>
+                                <strong>{{ addr.VATID }}</strong>
+                            </div>
+                            }
+                            @if (addr.CustomerNumber) {
+                            <div class="supplier-card__row">
+                                <p>Kundennummer</p>
+                                <strong>{{ addr.CustomerNumber }}</strong>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    }
+                </aside>
+            </div>
+        </form>
     </div>
-</form>
+</section>

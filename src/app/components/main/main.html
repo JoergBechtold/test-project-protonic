@@ -2,17 +2,8 @@
 <app-popup [trigger]="showSavePopup()">Änderungen wurden gespeichert</app-popup>
 
 @if (isEditPopupOpen()) {
-<div class="edit-popup-overlay" (click)="closeEditPage()"></div>
-<section class="edit-popup" role="dialog" aria-modal="true">
-    <header class="edit-popup__header">
-        <h2 class="edit-popup__title">Ticket {{ selectedTicketId() }}</h2>
-        <button class="edit-popup__close" type="button" (click)="closeEditPage()"
-            aria-label="Popup schließen">×</button>
-    </header>
-    <div class="edit-popup__content">
-        <app-edit-page [activityId]="selectedTicketId()" (closeRequested)="onEditPageSaved()"></app-edit-page>
-    </div>
-</section>
+<app-edit-page [activityId]="selectedTicketId()" (closeRequested)="onEditPageSaved()"
+    (closed)="closeEditPage()"></app-edit-page>
 }
 
 
