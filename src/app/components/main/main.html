@@ -1,4 +1,5 @@
 <app-loading [visible]="isLoading()" />
+<app-popup [trigger]="showSavePopup()">Änderungen wurden gespeichert</app-popup>
 
 @if (isEditPopupOpen()) {
 <div class="edit-popup-overlay" (click)="closeEditPage()"></div>
@@ -9,7 +10,7 @@
             aria-label="Popup schließen">×</button>
     </header>
     <div class="edit-popup__content">
-        <app-edit-page [activityId]="selectedTicketId()"></app-edit-page>
+        <app-edit-page [activityId]="selectedTicketId()" (closeRequested)="onEditPageSaved()"></app-edit-page>
     </div>
 </section>
 }

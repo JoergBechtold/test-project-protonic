@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Loading } from '../../shared/components/loading/loading';
+import { PopupComponent } from '../../shared/components/popup/popup';
 import { TicketCell, TicketCellViewModel } from './components/ticket-cell/ticket-cell';
 import { EditPage } from '../edit-page/edit-page';
 
@@ -12,7 +13,7 @@ type SubjectSortDirection = 'none' | 'asc' | 'desc';
 
 @Component({
   selector: 'app-main',
-  imports: [Loading, TicketCell, EditPage],
+  imports: [Loading, PopupComponent, TicketCell, EditPage],
   templateUrl: './main.html',
   styleUrls: ['./main.scss'],
 })
@@ -23,6 +24,7 @@ export class MainComponent implements OnInit {
 
   isLoading = signal(true);
   errorMessage = signal('ES ist ein Fehler aufgetreten.');
+  showSavePopup = signal(false);
   isEditPopupOpen = signal(false);
   selectedTicketId = signal('');
 
@@ -206,6 +208,12 @@ export class MainComponent implements OnInit {
 
   closeEditPage(): void {
     this.isEditPopupOpen.set(false);
+  }
+
+  onEditPageSaved(): void {
+    this.closeEditPage();
+    this.showSavePopup.set(false);
+    queueMicrotask(() => this.showSavePopup.set(true));
   }
 
   async logout(): Promise<void> {

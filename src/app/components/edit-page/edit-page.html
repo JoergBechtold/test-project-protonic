@@ -1,6 +1,5 @@
 <form class="edit-page" [formGroup]="form" (ngSubmit)="onSaveSubmit($event)">
     <app-loading [visible]="isLoadingFormdata()"></app-loading>
-    <app-popup [trigger]="showSavePopup()">Änderungen wurden gespeichert</app-popup>
 
     <header class="edit-page__top">
         <h1 class="edit-page__title">Bestellung · Detailansicht</h1>

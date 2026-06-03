@@ -1,14 +1,21 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../shared/services/api.service';
 import { Loading } from '../../shared/components/loading/loading';
-import { Popup } from '../../shared/components/popup/popup';
 
 @Component({
   selector: 'app-edit-page',
-  imports: [ReactiveFormsModule, Loading, Popup],
+  imports: [ReactiveFormsModule, Loading],
   templateUrl: './edit-page.html',
   styleUrls: ['./edit-page.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -25,7 +32,7 @@ export class EditPage {
   readonly loadError = signal('');
   readonly saveMessage = signal('');
   readonly saveError = signal('');
-  readonly showSavePopup = signal(false);
+  readonly closeRequested = output<void>();
   readonly currentActivityId = signal<number | null>(null);
   private readonly loadedFormdata = signal<Record<string, unknown> | null>(null);
 
@@ -66,18 +73,16 @@ export class EditPage {
     this.isSaving.set(true);
     this.saveMessage.set('');
     this.saveError.set('');
-    this.showSavePopup.set(false);
 
     try {
       const activityId = this.resolveActivityId();
       const payload = this.buildSavePayload(activityId);
       await firstValueFrom(this.apiService.saveActivity(payload));
       this.saveMessage.set('Aenderungen wurden gespeichert.');
-      queueMicrotask(() => this.showSavePopup.set(true));
+      queueMicrotask(() => this.closeRequested.emit());
     } catch (error) {
       console.error('Fehler beim Speichern der Aktivitaet:', error);
       this.saveError.set(this.buildSaveErrorMessage(error));
-      this.showSavePopup.set(false);
     } finally {
       this.isSaving.set(false);
     }
@@ -88,7 +93,6 @@ export class EditPage {
     this.loadError.set('');
     this.saveMessage.set('');
     this.saveError.set('');
-    this.showSavePopup.set(false);
 
     try {
       const formdata = await firstValueFrom(this.apiService.getActivityFormdata(activityId));

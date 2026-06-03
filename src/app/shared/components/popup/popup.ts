@@ -6,15 +6,15 @@ import { Component, DestroyRef, effect, inject, input, signal } from '@angular/c
   templateUrl: './popup.html',
   styleUrls: ['./popup.scss'],
 })
-export class Popup {
+export class PopupComponent {
   private readonly destroyRef = inject(DestroyRef);
   readonly trigger = input<boolean>(false);
 
   readonly shouldRender = signal(false);
   readonly animationState = signal<'enter' | 'exit'>('exit');
 
-  private readonly DISPLAY_DURATION = 5000;
-  private readonly ANIMATION_DURATION = 500;
+  private readonly DISPLAY_DURATION = 3000;
+  private readonly ANIMATION_DURATION = 200;
   private displayTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private hideTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private hasInitialized = false;
@@ -24,7 +24,6 @@ export class Popup {
     effect(() => {
       const currentTriggerValue = this.trigger();
 
-      // Ignore the first run to avoid opening on initial mount/HMR state restoration.
       if (!this.hasInitialized) {
         this.hasInitialized = true;
         this.lastTriggerValue = currentTriggerValue;
