@@ -1,7 +1,6 @@
-<!-- <div class="popup-container" [class.open]="show">
-    <ng-content></ng-content>
-</div> -->
-
-<div class="popup-container" [class.open]="isVisible()">
+@if (shouldRender()) {
+<div class="popup-container" [class.popup-container--open]="animationState() === 'enter'"
+    [class.popup-container--closing]="animationState() === 'exit'">
     <ng-content></ng-content>
 </div>
+}
