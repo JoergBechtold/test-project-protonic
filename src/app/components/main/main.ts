@@ -19,6 +19,11 @@ export class MainComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly pageSize = 6;
 
+  isLoading = signal(true);
+  errorMessage = signal('ES ist ein Fehler aufgetreten.');
+  isEditPopupOpen = signal(false);
+  selectedTicketId = signal('');
+
   rows = signal<ActivityRow[]>([]);
   ticketRows = computed<TicketCellViewModel[]>(() =>
     this.rows().map((row, index) => this.toTicketRow(row, index)),
@@ -107,10 +112,6 @@ export class MainComponent implements OnInit {
     items.push({ kind: 'page', page: totalPages, key: `page-${totalPages}` });
     return items;
   });
-  isLoading = signal(true);
-  errorMessage = signal('ES ist ein Fehler aufgetreten.');
-  isEditPopupOpen = signal(false);
-  selectedTicketId = signal('');
 
   private readonly typeToIconAndBg: Record<number, { icon: string; bg: string; alt: string }> = {
     8: { icon: 'clipboard-icon.png', bg: 'var(--icon-bg-orange)', alt: 'Aufgabe' },
@@ -121,29 +122,25 @@ export class MainComponent implements OnInit {
   };
 
   constructor() {
-    effect(
-      () => {
-        const totalPages = this.totalPages();
-        const currentPage = this.currentPage();
+    effect(() => {
+      const totalPages = this.totalPages();
+      const currentPage = this.currentPage();
 
-        if (totalPages === 0 && currentPage !== 1) {
-          this.currentPage.set(1);
-          return;
-        }
+      if (totalPages === 0 && currentPage !== 1) {
+        this.currentPage.set(1);
+        return;
+      }
 
-        if (totalPages > 0 && currentPage > totalPages) {
-          this.currentPage.set(totalPages);
-        }
-      },
-      { allowSignalWrites: true },
-    );
+      if (totalPages > 0 && currentPage > totalPages) {
+        this.currentPage.set(totalPages);
+      }
+    });
   }
 
   async ngOnInit(): Promise<void> {
     this.isLoading.set(true);
     try {
-      const today = new Date().toISOString().slice(0, 10);
-      const data = await firstValueFrom(this.apiService.getActivitiesList(today));
+      const data = await firstValueFrom(this.apiService.getActivitiesList());
 
       const rows = this.extractRows(data);
       if (rows.length > 0) {
@@ -232,36 +229,69 @@ export class MainComponent implements OnInit {
   }
 
   private toTicketRow(row: ActivityRow, index: number): TicketCellViewModel {
-    const typeKey = this.toNumber(row['type']);
+    const typeKey = this.toNumber(this.pickFirstValue(row, ['type', 'Type', 'activityType']));
     const typeMeta = this.typeToIconAndBg[typeKey] ?? {
       icon: 'calendar-icon.png',
       bg: 'var(--icon-bg-green)',
       alt: 'Aktivität',
     };
 
-    const directionLabel = this.asText(row['dir']);
-    const startsAt = this.asText(row['start']);
-    const schedule = this.parseSchedule(startsAt);
-    const contactName = this.asText(row['adr']);
-    const ownerName = this.asText(row['ownr']);
+    const id = this.asText(
+      this.pickFirstValue(row, ['IdActivity', 'idActivity', 'activityId', 'ActivityId', 'id']),
+      String(index + 1),
+    );
+    const directionLabel = this.asText(this.pickFirstValue(row, ['dir', 'direction', 'Direction']));
+    const startsAt = this.asText(
+      this.pickFirstValue(row, ['start', 'Start', 'startDate', 'StartDate', 'date', 'begda']),
+    );
+    const startTime = this.asText(
+      this.pickFirstValue(row, ['startTime', 'StartTime', 'timeStart', 'begti']),
+      '',
+    );
+    const endTime = this.asText(
+      this.pickFirstValue(row, ['endTime', 'EndTime', 'timeEnd', 'endti']),
+      '',
+    );
+    const schedule = this.parseSchedule(startsAt, startTime, endTime);
+    const contactName = this.asText(
+      this.pickFirstValue(row, ['adr', 'address', 'location', 'contact']),
+    );
+    const ownerName = this.asText(
+      this.pickFirstValue(row, ['ownr', 'owner', 'assignee', 'processor']),
+    );
+    const title = this.asText(
+      this.pickFirstValue(row, ['cap subj', 'caption', 'subject', 'title', 'name']),
+      'Ohne Betreff',
+    );
+    const priorityLabel = this.asText(this.pickFirstValue(row, ['prio', 'priority', 'Priority']));
 
     return {
-      id: this.asText(row['id'], String(index + 1)),
+      id,
       typeIconSrc: `assets/icons/${typeMeta.icon}`,
       typeIconAlt: typeMeta.alt,
       typeBgColor: typeMeta.bg,
-      title: this.asText(row['cap subj'], 'Ohne Betreff'),
-      location: this.asText(row['adr'], 'Kein Ort'),
+      title,
+      location: contactName === '-' ? 'Kein Ort' : contactName,
       contactInitials: this.getInitials(contactName),
       contactName,
       ownerInitials: this.getInitials(ownerName),
       ownerName,
       dueDay: schedule.day,
       dueTime: schedule.time,
-      priorityLabel: this.asText(row['prio']),
+      priorityLabel,
       directionLabel,
       directionArrowLeft: this.isDirectionIncoming(directionLabel),
     };
+  }
+
+  private pickFirstValue(source: ActivityRow, keys: string[]): unknown {
+    for (const key of keys) {
+      if (key in source) {
+        return source[key];
+      }
+    }
+
+    return undefined;
   }
 
   private asText(value: unknown, fallback = '-'): string {
@@ -294,20 +324,149 @@ export class MainComponent implements OnInit {
       .join('');
   }
 
-  private parseSchedule(value: string): { day: string; time: string } {
-    if (value === '-') {
+  private parseSchedule(
+    value: string,
+    startTimeValue: string,
+    endTimeValue: string,
+  ): { day: string; time: string } {
+    if (value === '-' && startTimeValue.length === 0 && endTimeValue.length === 0) {
       return { day: '-', time: '-' };
     }
 
     const normalized = value.replace(/\s+/g, ' ').trim();
-    const timeRange = normalized.match(/\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/)?.[0];
+    const startTime = this.extractTimeValue(startTimeValue) ?? this.extractTimeValue(normalized);
+    const endTime = this.extractTimeValue(endTimeValue);
 
-    if (!timeRange) {
-      return { day: 'Heute', time: normalized };
+    if (startTime && endTime) {
+      return { day: this.deriveDayLabel(normalized), time: `${startTime} – ${endTime}` };
     }
 
-    const day = normalized.replace(timeRange, '').trim() || 'Heute';
-    return { day, time: timeRange };
+    if (startTime) {
+      return { day: this.deriveDayLabel(normalized), time: startTime };
+    }
+
+    const timeRange = normalized.match(/\d{1,2}:\d{2}\s*-\s*\d{1,2}:\d{2}/)?.[0];
+    if (timeRange) {
+      const day = normalized.replace(timeRange, '').trim() || this.deriveDayLabel(normalized);
+      return { day, time: timeRange.replace(/\s*-\s*/, ' – ') };
+    }
+
+    const fallbackTime = /[a-zA-Z]/.test(normalized) ? normalized : '-';
+    return { day: this.deriveDayLabel(normalized), time: fallbackTime };
+  }
+
+  private extractTimeValue(value: string): string | null {
+    const match = value.match(/\b(\d{1,2}):(\d{2})(?::\d{2})?\b/);
+    if (!match) {
+      return null;
+    }
+
+    const hour = Number(match[1]);
+    const minute = Number(match[2]);
+    if (!Number.isFinite(hour) || !Number.isFinite(minute)) {
+      return null;
+    }
+
+    const safeHour = Math.min(Math.max(hour, 0), 23);
+    const safeMinute = Math.min(Math.max(minute, 0), 59);
+    return `${String(safeHour).padStart(2, '0')}:${String(safeMinute).padStart(2, '0')}`;
+  }
+
+  private deriveDayLabel(value: string): string {
+    if (!value || value === '-') {
+      return '-';
+    }
+
+    const date = this.extractDateValue(value);
+    if (!date) {
+      const normalizedText = value.replace(/\s+/g, ' ').trim();
+      if (normalizedText.length === 0) {
+        return '-';
+      }
+
+      const knownRelativeLabel = normalizedText.toLowerCase();
+      if (
+        knownRelativeLabel === 'heute' ||
+        knownRelativeLabel === 'morgen' ||
+        knownRelativeLabel === 'gestern'
+      ) {
+        return normalizedText[0].toUpperCase() + normalizedText.slice(1).toLowerCase();
+      }
+
+      return 'Heute';
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const target = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const dayDiff = Math.round((target.getTime() - today.getTime()) / 86400000);
+
+    if (dayDiff === 0) {
+      return 'Heute';
+    }
+
+    if (dayDiff === 1) {
+      return 'Morgen';
+    }
+
+    if (dayDiff === -1) {
+      return 'Gestern';
+    }
+
+    const weekdayLabels = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+    const weekday = weekdayLabels[target.getDay()];
+    const day = String(target.getDate()).padStart(2, '0');
+    const month = String(target.getMonth() + 1).padStart(2, '0');
+
+    return `${weekday} ${day}.${month}.`;
+  }
+
+  private extractDateValue(value: string): Date | null {
+    const normalized = value.replace(/\s+/g, ' ').trim();
+
+    const yearFirst = normalized.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/);
+    if (yearFirst) {
+      const parsed = this.buildDate(yearFirst[1], yearFirst[2], yearFirst[3]);
+      if (parsed) {
+        return parsed;
+      }
+    }
+
+    const dayFirst = normalized.match(/(\d{1,2})\D+(\d{1,2})\D+(\d{4})/);
+    if (dayFirst) {
+      const parsed = this.buildDate(dayFirst[3], dayFirst[2], dayFirst[1]);
+      if (parsed) {
+        return parsed;
+      }
+    }
+
+    const compact = normalized.match(/\b(\d{4})(\d{2})(\d{2})\b/);
+    if (compact) {
+      return this.buildDate(compact[1], compact[2], compact[3]);
+    }
+
+    return null;
+  }
+
+  private buildDate(yearText: string, monthText: string, dayText: string): Date | null {
+    const year = Number(yearText);
+    const month = Number(monthText);
+    const day = Number(dayText);
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) {
+      return null;
+    }
+
+    const date = new Date(year, month - 1, day);
+    if (
+      Number.isNaN(date.getTime()) ||
+      date.getFullYear() !== year ||
+      date.getMonth() !== month - 1 ||
+      date.getDate() !== day
+    ) {
+      return null;
+    }
+
+    return date;
   }
 
   private isDirectionIncoming(value: string): boolean {

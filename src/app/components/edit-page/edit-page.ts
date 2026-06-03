@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { ApiService } from '../../shared/services/api.service';
 import { Loading } from '../../shared/components/loading/loading';
@@ -15,7 +16,7 @@ import { Popup } from '../../shared/components/popup/popup';
 export class EditPage {
   private readonly apiService = inject(ApiService);
   private readonly formBuilder = inject(FormBuilder);
-  private readonly defaultActivityId = 90724;
+  private readonly defaultActivityId = 1;
 
   readonly activityId = input<number | string | null>(null);
 
@@ -51,6 +52,12 @@ export class EditPage {
     });
   }
 
+  onSaveSubmit(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    void this.save();
+  }
+
   async save(): Promise<void> {
     if (this.isSaving()) {
       return;
@@ -69,7 +76,7 @@ export class EditPage {
       queueMicrotask(() => this.showSavePopup.set(true));
     } catch (error) {
       console.error('Fehler beim Speichern der Aktivitaet:', error);
-      this.saveError.set('Speichern fehlgeschlagen. Bitte erneut versuchen.');
+      this.saveError.set(this.buildSaveErrorMessage(error));
       this.showSavePopup.set(false);
     } finally {
       this.isSaving.set(false);
@@ -135,7 +142,6 @@ export class EditPage {
       endTime: values.endTime,
       assignee: values.assignee,
       ownr: values.assignee,
-      address: values.address,
       adr: values.address,
       finalized: values.finalized,
     };
@@ -189,5 +195,45 @@ export class EditPage {
     }
 
     return false;
+  }
+
+  private buildSaveErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      const serverMessage = this.extractServerMessage(error.error);
+      if (serverMessage) {
+        return `Speichern fehlgeschlagen: ${serverMessage}`;
+      }
+
+      return `Speichern fehlgeschlagen (HTTP ${error.status || 'unbekannt'}).`;
+    }
+
+    if (error instanceof Error && error.message.trim().length > 0) {
+      return `Speichern fehlgeschlagen: ${error.message}`;
+    }
+
+    return 'Speichern fehlgeschlagen. Bitte erneut versuchen.';
+  }
+
+  private extractServerMessage(errorBody: unknown): string {
+    if (!errorBody) {
+      return '';
+    }
+
+    if (typeof errorBody === 'string') {
+      return errorBody.trim();
+    }
+
+    if (typeof errorBody === 'object') {
+      const record = errorBody as Record<string, unknown>;
+      const candidates = ['message', 'Message', 'error', 'Error', 'detail', 'Detail'];
+      for (const key of candidates) {
+        const value = record[key];
+        if (typeof value === 'string' && value.trim().length > 0) {
+          return value.trim();
+        }
+      }
+    }
+
+    return '';
   }
 }

@@ -54,7 +54,7 @@
     <div class="pagination">
         <div class="pagination__left">{{ pageRangeLabel() }}</div>
         <div class="pagination__center">
-            <div class="pagination__nav-slot" aria-hidden="true">
+            <div class="pagination__nav-slot">
                 @if (canGoPrevious()) {
                 <button class="pagination__nav pagination__nav--prev" type="button" (click)="goToPreviousPage()">
                     <img class="pagination__nav-icon" src="assets/icons/chevron-icon.png" alt="pfeil icon links" />
@@ -73,7 +73,7 @@
             }
             }
 
-            <div class="pagination__nav-slot" aria-hidden="true">
+            <div class="pagination__nav-slot">
                 @if (canGoNext()) {
                 <button class="pagination__nav pagination__nav--next" type="button" (click)="goToNextPage()">
                     <img class="pagination__nav-icon" src="assets/icons/chevron-icon.png" alt="pfeil icon rechts" />

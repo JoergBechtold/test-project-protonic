@@ -1,4 +1,4 @@
-<form class="edit-page" [formGroup]="form" (ngSubmit)="save()">
+<form class="edit-page" [formGroup]="form" (ngSubmit)="onSaveSubmit($event)">
     <app-loading [visible]="isLoadingFormdata()"></app-loading>
     <app-popup [trigger]="showSavePopup()">Änderungen wurden gespeichert</app-popup>
 

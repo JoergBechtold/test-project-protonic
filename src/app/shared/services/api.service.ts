@@ -8,6 +8,7 @@ import { environment } from '../../../environments/environment';
 })
 export class ApiService {
   private baseUrl = environment.apiUrl;
+  private readonly defaultActivitiesStartDate = '2020-01-01';
 
   constructor(private http: HttpClient) {}
 
@@ -21,9 +22,16 @@ export class ApiService {
   }
 
   // Holt die Liste aller Aktivitäten (neuer Endpunkt!)
-  getActivitiesList(startDate: string): Observable<any> {
-    // Beispiel: 2026-05-30
-    const url = `${this.baseUrl}/api.json/v2/crm/Activities/List?IsActivityCenter=true&StartDate=${startDate}`;
+  getActivitiesList(
+    startDate = this.defaultActivitiesStartDate,
+    idActivity?: number,
+  ): Observable<any> {
+    // Standard: 2020-01-01 (kann bei Bedarf beim Aufruf ueberschrieben werden)
+    const idActivityParam =
+      typeof idActivity === 'number' && Number.isFinite(idActivity)
+        ? `&IdActivity=${idActivity}`
+        : '';
+    const url = `${this.baseUrl}/api.json/v2/crm/Activities/List?IsActivityCenter=true&StartDate=${startDate}${idActivityParam}`;
     return this.http.get<any>(url, { headers: this.getAuthHeaders() });
   }
 
@@ -47,7 +55,7 @@ export class ApiService {
     // POST-Request an den Save-Endpunkt
     // Die API erwartet die Daten im Body als JSON
     const url = `${this.baseUrl}/api.json/Activities/Save`;
-    return this.http.post<any>(url, activityData, { headers: this.getAuthHeaders() });
+    return this.http.post<any>(url, { model: activityData }, { headers: this.getAuthHeaders() });
   }
 
   /**
