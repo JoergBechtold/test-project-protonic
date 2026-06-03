@@ -66,6 +66,8 @@
         grid-template-columns: minmax(0, 1fr) 340px;
         gap: 16px;
         align-items: start;
+        width: 100%;
+        max-width: 1240px;
     }
 
     &__status {
@@ -275,10 +277,10 @@
         }
 
         textarea {
-            min-height: 96px;
-            resize: vertical;
+            min-height: 170px;
+            height: 170px;
+            resize: none;
             padding: 10px;
-            line-height: 1.35;
         }
     }
 

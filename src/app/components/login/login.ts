@@ -24,6 +24,10 @@ export class LoginComponent {
   ) {}
 
   async login() {
+    if (this.isLoading()) {
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set('');
 
@@ -43,11 +47,16 @@ export class LoginComponent {
           headers,
         }),
       );
+
       localStorage.setItem('token', response.access_token);
-      this.router.navigate(['/main']);
+      const didNavigate = await this.router.navigate(['/main']);
+
+      if (!didNavigate) {
+        this.errorMessage.set('Login erfolgreich, aber Navigation zur Hauptseite fehlgeschlagen.');
+        this.isLoading.set(false);
+      }
     } catch {
       this.errorMessage.set('Login fehlgeschlagen. Bitte überprüfe Benutzername und Passwort.');
-    } finally {
       this.isLoading.set(false);
     }
   }

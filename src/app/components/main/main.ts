@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Loading } from '../../shared/components/loading/loading';
@@ -17,6 +18,7 @@ type SubjectSortDirection = 'none' | 'asc' | 'desc';
 })
 export class MainComponent implements OnInit {
   private readonly apiService = inject(ApiService);
+  private readonly router = inject(Router);
   private readonly pageSize = 6;
 
   isLoading = signal(true);
@@ -204,6 +206,21 @@ export class MainComponent implements OnInit {
 
   closeEditPage(): void {
     this.isEditPopupOpen.set(false);
+  }
+
+  async logout(): Promise<void> {
+    if (this.isLoading()) {
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    localStorage.removeItem('token');
+
+    const didNavigate = await this.router.navigate(['/login']);
+    if (!didNavigate) {
+      this.isLoading.set(false);
+    }
   }
 
   private extractRows(data: unknown): ActivityRow[] {

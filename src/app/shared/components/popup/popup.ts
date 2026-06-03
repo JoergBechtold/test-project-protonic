@@ -17,14 +17,27 @@ export class Popup {
   private readonly ANIMATION_DURATION = 500;
   private displayTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private hideTimeoutId: ReturnType<typeof setTimeout> | null = null;
+  private hasInitialized = false;
+  private lastTriggerValue = false;
 
   constructor() {
     effect(() => {
-      if (this.trigger()) {
+      const currentTriggerValue = this.trigger();
+
+      // Ignore the first run to avoid opening on initial mount/HMR state restoration.
+      if (!this.hasInitialized) {
+        this.hasInitialized = true;
+        this.lastTriggerValue = currentTriggerValue;
+        return;
+      }
+
+      if (currentTriggerValue && !this.lastTriggerValue) {
         this.show();
-      } else {
+      } else if (!currentTriggerValue && this.lastTriggerValue) {
         this.hide();
       }
+
+      this.lastTriggerValue = currentTriggerValue;
     });
 
     this.destroyRef.onDestroy(() => {

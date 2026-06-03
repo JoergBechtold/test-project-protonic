@@ -3,7 +3,7 @@
     <input [(ngModel)]="username" name="username" placeholder="Benutzername" />
     <input [(ngModel)]="password" name="password" type="password" placeholder="Passwort" />
 
-    <button type="submit">Login</button>
+    <button type="submit" [disabled]="isLoading()">Login</button>
     @if (errorMessage()) {
     <p class="error">{{ errorMessage() }}</p>
     }

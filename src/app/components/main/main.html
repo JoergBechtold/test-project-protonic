@@ -1,8 +1,8 @@
 <app-loading [visible]="isLoading()" />
 
 @if (isEditPopupOpen()) {
-<div class="edit-popup-overlay" (click)="closeEditPage()" aria-hidden="true"></div>
-<section class="edit-popup" role="dialog" aria-modal="true" aria-label="Ticket bearbeiten">
+<div class="edit-popup-overlay" (click)="closeEditPage()"></div>
+<section class="edit-popup" role="dialog" aria-modal="true">
     <header class="edit-popup__header">
         <h2 class="edit-popup__title">Ticket {{ selectedTicketId() }}</h2>
         <button class="edit-popup__close" type="button" (click)="closeEditPage()"
@@ -80,6 +80,11 @@
                 </button>
                 }
             </div>
+        </div>
+        <div class="pagination__right">
+            <button class="pagination__logout" type="button" (click)="logout()" [disabled]="isLoading()">
+                Ausloggen
+            </button>
         </div>
     </div>
 </div>
