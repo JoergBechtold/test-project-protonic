@@ -22,7 +22,15 @@
                         </span>
                     </button>
                 </div>
-                <div class="main-content__header-cell">Kontakt</div>
+                <div class="main-content__header-cell"><button class="main-content__sort-button" type="button"
+                        (click)="toggleContactSort()"
+                        [class.main-content__sort-button--active]="contactSortDirection() !== 'none'">
+                        <span>Kontakt</span>
+                        <span class="main-content__sort-indicator">
+                            {{ contactSortDirection() === 'none' ? '↕' : contactSortDirection() === 'desc' ? '↓' : '↑'
+                            }}
+                        </span>
+                    </button></div>
                 <div class="main-content__header-cell">Bearbeiter</div>
                 <div class="main-content__header-cell">Wann</div>
                 <div class="main-content__header-cell">Prio</div>

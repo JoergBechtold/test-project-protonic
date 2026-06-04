@@ -32,19 +32,47 @@ export class MainComponent implements OnInit {
   ticketRows = computed<TicketCellViewModel[]>(() =>
     this.rows().map((row, index) => this.toTicketRow(row, index)),
   );
-  subjectSortDirection = signal<SubjectSortDirection>('none');
+  private static readonly SORT_STORAGE_KEY = 'main-sort';
+
+  private loadSortFromStorage(): { subject: SubjectSortDirection; contact: SubjectSortDirection } {
+    try {
+      const raw = localStorage.getItem(MainComponent.SORT_STORAGE_KEY);
+      if (!raw) return { subject: 'none', contact: 'none' };
+      const parsed = JSON.parse(raw);
+      const valid: SubjectSortDirection[] = ['none', 'asc', 'desc'];
+      return {
+        subject: valid.includes(parsed.subject) ? parsed.subject : 'none',
+        contact: valid.includes(parsed.contact) ? parsed.contact : 'none',
+      };
+    } catch {
+      return { subject: 'none', contact: 'none' };
+    }
+  }
+
+  private saveSortToStorage(subject: SubjectSortDirection, contact: SubjectSortDirection): void {
+    localStorage.setItem(MainComponent.SORT_STORAGE_KEY, JSON.stringify({ subject, contact }));
+  }
+
+  subjectSortDirection = signal<SubjectSortDirection>(this.loadSortFromStorage().subject);
+  contactSortDirection = signal<SubjectSortDirection>(this.loadSortFromStorage().contact);
   sortedTicketRows = computed<TicketCellViewModel[]>(() => {
-    const direction = this.subjectSortDirection();
+    const subjectDirection = this.subjectSortDirection();
+    const contactDirection = this.contactSortDirection();
     const tickets = [...this.ticketRows()];
 
-    if (direction === 'none') {
-      return tickets;
+    if (subjectDirection !== 'none') {
+      tickets.sort((left, right) => {
+        const comparison = left.title.localeCompare(right.title, 'de', { sensitivity: 'base' });
+        return subjectDirection === 'asc' ? comparison : comparison * -1;
+      });
+    } else if (contactDirection !== 'none') {
+      tickets.sort((left, right) => {
+        const comparison = left.contactName.localeCompare(right.contactName, 'de', {
+          sensitivity: 'base',
+        });
+        return contactDirection === 'asc' ? comparison : comparison * -1;
+      });
     }
-
-    tickets.sort((left, right) => {
-      const comparison = left.title.localeCompare(right.title, 'de', { sensitivity: 'base' });
-      return direction === 'asc' ? comparison : comparison * -1;
-    });
 
     return tickets;
   });
@@ -179,9 +207,22 @@ export class MainComponent implements OnInit {
   toggleSubjectSort(): void {
     const currentDirection = this.subjectSortDirection();
     const nextDirection: SubjectSortDirection =
-      currentDirection === 'none' ? 'asc' : currentDirection === 'asc' ? 'desc' : 'asc';
+      currentDirection === 'none' ? 'asc' : currentDirection === 'asc' ? 'desc' : 'none';
 
     this.subjectSortDirection.set(nextDirection);
+    this.contactSortDirection.set('none');
+    this.saveSortToStorage(nextDirection, 'none');
+    this.currentPage.set(1);
+  }
+
+  toggleContactSort(): void {
+    const currentDirection = this.contactSortDirection();
+    const nextDirection: SubjectSortDirection =
+      currentDirection === 'none' ? 'asc' : currentDirection === 'asc' ? 'desc' : 'none';
+
+    this.contactSortDirection.set(nextDirection);
+    this.subjectSortDirection.set('none');
+    this.saveSortToStorage('none', nextDirection);
     this.currentPage.set(1);
   }
 

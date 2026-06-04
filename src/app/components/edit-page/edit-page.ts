@@ -1,12 +1,4 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  effect,
-  inject,
-  input,
-  output,
-  signal,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -91,9 +83,18 @@ export class EditPage {
     try {
       const activityId = this.resolveActivityId();
       const payload = this.buildSavePayload(activityId);
-      await firstValueFrom(this.apiService.saveActivity(payload));
-      this.saveMessage.set('Aenderungen wurden gespeichert.');
-      queueMicrotask(() => this.closeRequested.emit());
+      const response = await firstValueFrom(this.apiService.saveActivity(payload));
+
+      if (response && response.Success === false) {
+        const fieldErrors = response.ErrorMessages
+          ? Object.values(response.ErrorMessages as Record<string, string>).join(' ')
+          : '';
+        throw new Error(fieldErrors || response.Message || 'Unbekannter Fehler vom Server.');
+      }
+
+      this.saveMessage.set('Änderungen wurden gespeichert.');
+      this.isEditable.set(false);
+      this.form.disable();
     } catch (error) {
       console.error('Fehler beim Speichern der Aktivitaet:', error);
       this.saveError.set(this.buildSaveErrorMessage(error));
@@ -115,23 +116,19 @@ export class EditPage {
       const safeDetails = this.asRecord(details);
       const safeFormdata = this.asRecord(formdata);
 
-      this.loadedFormdata.set(safeFormdata);
+      this.loadedFormdata.set(safeDetails);
       this.currentActivityId.set(activityId);
 
       const combinedData = { ...safeDetails, ...safeFormdata };
 
-      // Store dropdown options and address data
       this.activityTypes.set(
         Array.isArray(combinedData['ActivityTypes']) ? combinedData['ActivityTypes'] : [],
       );
       this.users.set(Array.isArray(combinedData['Users']) ? combinedData['Users'] : []);
       this.addressData.set(combinedData['Address'] || null);
 
-      // Parse dates (API format: "2020-10-07T10:00:00.0000000")
       const startDateParsed = this.parseDateTime(combinedData['StartDate']);
       const endDateParsed = this.parseDateTime(combinedData['EndDate']);
-
-      // Format address object to text
       const addressText = this.formatAddress(combinedData['Address']);
 
       this.form.patchValue({
@@ -159,22 +156,40 @@ export class EditPage {
     const basePayload = this.loadedFormdata() ?? {};
     const values = this.form.getRawValue();
 
+    const selectedType = this.activityTypes().find(t => t.Caption === values.activityType);
+    const selectedUser = this.users().find(u => u.Caption === values.assignee);
+
     return {
       ...basePayload,
       id: activityId,
       activityId,
+      IdActivityType: selectedType?.IdActivityType ?? (basePayload as any)['IdActivityType'],
+      ActivityType: values.activityType,
       activityType: values.activityType,
-      subject: values.caption,
+      Caption: values.caption,
       caption: values.caption,
-      startDate: values.startDate,
-      startTime: values.startTime,
-      endDate: values.endDate,
-      endTime: values.endTime,
+      subject: values.caption,
+      StartDate: this.formatDateTimeForApi(values.startDate, values.startTime),
+      startDate: this.formatDateTimeForApi(values.startDate, values.startTime),
+      EndDate: this.formatDateTimeForApi(values.endDate, values.endTime),
+      endDate: this.formatDateTimeForApi(values.endDate, values.endTime),
+      IdUser: selectedUser?.IdUser ?? (basePayload as any)['IdUser'],
+      User: values.assignee,
       assignee: values.assignee,
       ownr: values.assignee,
       adr: values.address,
+      Finalized: values.finalized,
       finalized: values.finalized,
     };
+  }
+
+  private formatDateTimeForApi(date: string, time: string): string {
+    if (!date) return '';
+    const parts = date.split('.');
+    if (parts.length !== 3) return date;
+    const [day, month, year] = parts;
+    const [hours, minutes] = (time || '00:00').split(':');
+    return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}T${(hours || '00').padStart(2, '0')}:${(minutes || '00').padStart(2, '0')}:00.0000000`;
   }
 
   private resolveActivityId(): number {
@@ -187,6 +202,49 @@ export class EditPage {
     return value !== null && typeof value === 'object' && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};
+  }
+
+  private parseDateTime(value: unknown): { date: string; time: string } {
+    if (!value || typeof value !== 'string') {
+      return { date: '', time: '' };
+    }
+    try {
+      const date = new Date(value);
+      if (isNaN(date.getTime())) {
+        return { date: '', time: '' };
+      }
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      return { date: `${day}.${month}.${year}`, time: `${hours}:${minutes}` };
+    } catch {
+      return { date: '', time: '' };
+    }
+  }
+
+  private formatAddress(address: unknown): string {
+    if (!address || typeof address !== 'object') {
+      return '';
+    }
+    const addr = address as Record<string, unknown>;
+    const parts: string[] = [];
+    if (addr['Company']) parts.push(String(addr['Company']));
+    if (addr['FirstName'] || addr['Surname']) {
+      const name = [addr['FirstName'], addr['Surname']].filter(Boolean).join(' ');
+      if (name) parts.push(name);
+    }
+    if (addr['Street']) parts.push(String(addr['Street']));
+    if (addr['Zip'] || addr['City']) {
+      const location = [addr['Zip'], addr['City']].filter(Boolean).join(' ');
+      if (location) parts.push(location);
+    }
+    if (addr['Country'] && typeof addr['Country'] === 'object') {
+      const country = addr['Country'] as Record<string, unknown>;
+      if (country['Caption']) parts.push(String(country['Caption']));
+    }
+    return parts.join('\n');
   }
 
   private asText(value: unknown, fallback = ''): string {
@@ -215,60 +273,6 @@ export class EditPage {
     }
 
     return false;
-  }
-
-  private parseDateTime(value: unknown): { date: string; time: string } {
-    if (!value || typeof value !== 'string') {
-      return { date: '', time: '' };
-    }
-
-    try {
-      // API format: "2020-10-07T10:00:00.0000000"
-      const date = new Date(value);
-      if (isNaN(date.getTime())) {
-        return { date: '', time: '' };
-      }
-
-      const day = String(date.getDate()).padStart(2, '0');
-      const month = String(date.getMonth() + 1).padStart(2, '0');
-      const year = date.getFullYear();
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-
-      return {
-        date: `${day}.${month}.${year}`,
-        time: `${hours}:${minutes}`,
-      };
-    } catch {
-      return { date: '', time: '' };
-    }
-  }
-
-  private formatAddress(address: unknown): string {
-    if (!address || typeof address !== 'object') {
-      return '';
-    }
-
-    const addr = address as Record<string, unknown>;
-    const parts: string[] = [];
-
-    if (addr['Company']) parts.push(String(addr['Company']));
-    if (addr['FirstName'] || addr['Surname']) {
-      const name = [addr['FirstName'], addr['Surname']].filter(Boolean).join(' ');
-      if (name) parts.push(name);
-    }
-    if (addr['Street']) parts.push(String(addr['Street']));
-    if (addr['Zip'] || addr['City']) {
-      const location = [addr['Zip'], addr['City']].filter(Boolean).join(' ');
-      if (location) parts.push(location);
-    }
-    // Country is an object with Caption property
-    if (addr['Country'] && typeof addr['Country'] === 'object') {
-      const country = addr['Country'] as Record<string, unknown>;
-      if (country['Caption']) parts.push(String(country['Caption']));
-    }
-
-    return parts.join('\n');
   }
 
   private buildSaveErrorMessage(error: unknown): string {

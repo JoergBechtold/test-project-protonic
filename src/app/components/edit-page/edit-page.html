@@ -17,21 +17,22 @@
                     <img src="../../assets/icons/head-icon.png" alt="Kopf Icon">
                     <span>Kopfdaten</span>
                 </div>
+                <div class="edit-page__status">
+                    @if (loadError()) {
+                    <p class="edit-page__notice edit-page__notice--error">{{ loadError() }}</p>
+                    } @else if (saveError()) {
+                    <p class="edit-page__notice edit-page__notice--error">{{ saveError() }}</p>
+                    } @else {
+                    <p class="edit-page__notice edit-page__notice--placeholder">&nbsp;</p>
+                    }
+                </div>
                 <button class="edit-page__save" type="button" (click)="onSaveSubmit($event)" [disabled]="isSaving()">
                     <img src="../../assets/icons/check-icon.png" alt="Haken Icon">
                     <span>{{ isSaving() ? 'Speichere...' : 'Speichern' }}</span>
                 </button>
             </div>
 
-            <div class="edit-page__status">
-                @if (loadError()) {
-                <p class="edit-page__notice edit-page__notice--error">{{ loadError() }}</p>
-                } @else if (saveError()) {
-                <p class="edit-page__notice edit-page__notice--error">{{ saveError() }}</p>
-                } @else {
-                <p class="edit-page__notice edit-page__notice--placeholder">&nbsp;</p>
-                }
-            </div>
+
 
             <div class="edit-page__layout">
                 <article class="detail-card detail-card--activity">
@@ -43,9 +44,9 @@
                         <div class="activity-row">
                             <p class="activity-row__label">Aktivitätstyp</p>
                             <div class="activity-row__value">
-                                <select class="field__select" formControlName="activityType">
+                                <select class="field__select" formControlName="activityTypeId">
                                     @for (type of activityTypes(); track type.IdActivityType) {
-                                    <option [value]="type.Caption">{{ type.Caption }}</option>
+                                    <option [value]="type.IdActivityType.toString()">{{ type.Caption }}</option>
                                     }
                                 </select>
                             </div>
@@ -77,10 +78,10 @@
                         <div class="activity-row">
                             <p class="activity-row__label">Bearbeiter</p>
                             <div class="activity-row__value">
-                                <select class="field__select" formControlName="assignee">
+                                <select class="field__select" formControlName="assigneeId">
                                     <option value="">Auswählen</option>
                                     @for (user of users(); track user.IdUser) {
-                                    <option [value]="user.Caption">{{ user.Caption }}</option>
+                                    <option [value]="user.IdUser.toString()">{{ user.Caption }}</option>
                                     }
                                 </select>
                             </div>
