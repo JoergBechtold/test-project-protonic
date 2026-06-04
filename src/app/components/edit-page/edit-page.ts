@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, inject, input, output, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  effect,
+  inject,
+  input,
+  output,
+  signal,
+} from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
@@ -34,13 +42,13 @@ export class EditPage {
   readonly isEditable = signal(false);
 
   readonly form = this.formBuilder.nonNullable.group({
-    activityType: 'E-Mail',
+    activityTypeId: '',
     caption: '',
     startDate: '',
     startTime: '',
     endDate: '',
     endTime: '',
-    assignee: '',
+    assigneeId: '',
     address: '',
     finalized: false,
   });
@@ -92,9 +100,9 @@ export class EditPage {
         throw new Error(fieldErrors || response.Message || 'Unbekannter Fehler vom Server.');
       }
 
-      this.saveMessage.set('Änderungen wurden gespeichert.');
-      this.isEditable.set(false);
-      this.form.disable();
+      // Erfolgreich gespeichert!
+      console.log('=== SAVE SUCCESSFUL ===');
+      this.closeRequested.emit();
     } catch (error) {
       console.error('Fehler beim Speichern der Aktivitaet:', error);
       this.saveError.set(this.buildSaveErrorMessage(error));
@@ -129,17 +137,28 @@ export class EditPage {
 
       const startDateParsed = this.parseDateTime(combinedData['StartDate']);
       const endDateParsed = this.parseDateTime(combinedData['EndDate']);
-      const addressText = this.formatAddress(combinedData['Address']);
+
+      // Body-Feld für Notizen/Beschreibung
+      const bodyText = this.asText(combinedData['Body'], '');
+
+      const activityTypeId = combinedData['IdActivityType'];
+      const assigneeId = combinedData['IdUser'];
+
+      console.log('=== LOADING FORM DATA ===');
+      console.log('IdActivityType:', activityTypeId);
+      console.log('Caption:', combinedData['Caption']);
+      console.log('IdUser:', assigneeId);
+      console.log('Body:', bodyText);
 
       this.form.patchValue({
-        activityType: this.asText(combinedData['ActivityType'], 'E-Mail'),
+        activityTypeId: activityTypeId ? String(activityTypeId) : '',
         caption: this.asText(combinedData['Caption']),
         startDate: startDateParsed.date,
         startTime: startDateParsed.time,
         endDate: endDateParsed.date,
         endTime: endDateParsed.time,
-        assignee: this.asText(combinedData['User']),
-        address: addressText,
+        assigneeId: assigneeId ? String(assigneeId) : '',
+        address: bodyText,
         finalized: this.asBool(combinedData['Finalized']),
       });
     } catch (error) {
@@ -156,31 +175,33 @@ export class EditPage {
     const basePayload = this.loadedFormdata() ?? {};
     const values = this.form.getRawValue();
 
-    const selectedType = this.activityTypes().find(t => t.Caption === values.activityType);
-    const selectedUser = this.users().find(u => u.Caption === values.assignee);
+    console.log('=== BUILDING SAVE PAYLOAD ===');
+    console.log('Form values:', values);
+    console.log('Base payload:', basePayload);
 
-    return {
+    // IDs direkt aus dem Formular nehmen und in Zahlen konvertieren
+    const idActivityType = values.activityTypeId ? Number(values.activityTypeId) : 1;
+    const idUser = values.assigneeId ? Number(values.assigneeId) : undefined;
+    const caption = values.caption || (basePayload as any)['Caption'] || '';
+
+    console.log('Parsed IdActivityType:', idActivityType);
+    console.log('Parsed Caption:', caption);
+    console.log('Parsed IdUser:', idUser);
+
+    const payload = {
       ...basePayload,
-      id: activityId,
-      activityId,
-      IdActivityType: selectedType?.IdActivityType ?? (basePayload as any)['IdActivityType'],
-      ActivityType: values.activityType,
-      activityType: values.activityType,
-      Caption: values.caption,
-      caption: values.caption,
-      subject: values.caption,
+      IdActivity: activityId,
+      IdActivityType: idActivityType,
+      Caption: caption,
       StartDate: this.formatDateTimeForApi(values.startDate, values.startTime),
-      startDate: this.formatDateTimeForApi(values.startDate, values.startTime),
       EndDate: this.formatDateTimeForApi(values.endDate, values.endTime),
-      endDate: this.formatDateTimeForApi(values.endDate, values.endTime),
-      IdUser: selectedUser?.IdUser ?? (basePayload as any)['IdUser'],
-      User: values.assignee,
-      assignee: values.assignee,
-      ownr: values.assignee,
-      adr: values.address,
+      IdUser: idUser !== undefined ? idUser : (basePayload as any)['IdUser'],
+      Body: values.address || '',
       Finalized: values.finalized,
-      finalized: values.finalized,
     };
+
+    console.log('Final payload:', payload);
+    return payload;
   }
 
   private formatDateTimeForApi(date: string, time: string): string {

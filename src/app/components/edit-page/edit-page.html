@@ -10,7 +10,7 @@
     </header>
     <div class="edit-page-popup__content">
         <form class="edit-page" [formGroup]="form">
-            <app-loading [visible]="isLoadingFormdata()"></app-loading>
+            <app-loading [visible]="isLoadingFormdata() || isSaving()"></app-loading>
 
             <div class="edit-page__chip-row">
                 <div class="edit-page__chip">
@@ -88,7 +88,7 @@
                         </div>
 
                         <div class="activity-row activity-row--address">
-                            <p class="activity-row__label">Adresse</p>
+                            <p class="activity-row__label">Beschreibung</p>
                             <div class="activity-row__value">
                                 <textarea rows="4" formControlName="address"></textarea>
                                 <button class="activity-edit-btn" type="button" (click)="onEdit()"

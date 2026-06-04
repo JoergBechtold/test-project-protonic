@@ -170,27 +170,32 @@ export class MainComponent implements OnInit {
   }
 
   async ngOnInit(): Promise<void> {
-    this.isLoading.set(true);
+    await this.loadActivities();
+  }
+
+  async loadActivities(silent = false): Promise<void> {
+    if (!silent) {
+      this.isLoading.set(true);
+    }
     try {
       const data = await firstValueFrom(this.apiService.getActivitiesList());
 
       const rows = this.extractRows(data);
       if (rows.length > 0) {
         this.rows.set(rows);
-        this.currentPage.set(1);
         this.errorMessage.set('');
       } else {
         this.rows.set([]);
-        this.currentPage.set(1);
         this.errorMessage.set('Keine Aktivitäten gefunden.');
       }
     } catch (err) {
       console.error('API-Fehler:', err);
       this.rows.set([]);
-      this.currentPage.set(1);
       this.errorMessage.set('Es ist ein Fehler aufgetreten.');
     } finally {
-      this.isLoading.set(false);
+      if (!silent) {
+        this.isLoading.set(false);
+      }
     }
   }
 
@@ -251,10 +256,12 @@ export class MainComponent implements OnInit {
     this.isEditPopupOpen.set(false);
   }
 
-  onEditPageSaved(): void {
+  async onEditPageSaved(): Promise<void> {
     this.closeEditPage();
     this.showSavePopup.set(false);
     queueMicrotask(() => this.showSavePopup.set(true));
+    // Liste im Hintergrund neu laden (ohne Loading-Screen)
+    await this.loadActivities(true);
   }
 
   async logout(): Promise<void> {

@@ -53,9 +53,11 @@ export class ApiService {
   // Die Daten müssen als Objekt (z.B. aus einem Formular) übergeben werden
   saveActivity(activityData: any): Observable<any> {
     // POST-Request an den Save-Endpunkt
-    // Die API erwartet die Daten im Body als JSON
+    // Die API erwartet die Daten direkt im Body als JSON (ohne model Wrapper)
     const url = `${this.baseUrl}/api.json/Activities/Save`;
-    return this.http.post<any>(url, { model: activityData }, { headers: this.getAuthHeaders() });
+    console.log('=== API SERVICE: Sending to', url, '===');
+    console.log('Payload:', activityData);
+    return this.http.post<any>(url, activityData, { headers: this.getAuthHeaders() });
   }
 
   /**
