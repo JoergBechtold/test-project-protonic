@@ -18,7 +18,7 @@
                     <span>Kopfdaten</span>
                 </div>
                 <button class="edit-page__save" type="button" (click)="onSaveSubmit($event)" [disabled]="isSaving()">
-                    <img src="../../assets/icons/check-icon.png" alt="">
+                    <img src="../../assets/icons/check-icon.png" alt="Haken Icon">
                     <span>{{ isSaving() ? 'Speichere...' : 'Speichern' }}</span>
                 </button>
             </div>
@@ -104,56 +104,50 @@
                 </article>
 
                 <aside class="detail-card detail-card--supplier">
-                    @if (addressData(); as addr) {
                     <div class="supplier-card">
                         <div class="supplier-card__head">
-                            <div class="supplier-card__avatar">{{ addr.Company ? addr.Company.substring(0,
-                                2).toUpperCase() :
-                                'NA' }}</div>
+                            <div class="supplier-card__avatar">{{ addressData()?.Company ?
+                                addressData()!.Company.substring(0, 2).toUpperCase() : '' }}</div>
                             <div>
-                                <p class="supplier-card__name">{{ addr.Company || 'N/A' }}</p>
-                                <p class="supplier-card__meta">Adresse · {{ addr.Number || 'N/A' }}</p>
+                                <p class="supplier-card__name">{{ addressData()?.Company || '' }}</p>
+                                <p class="supplier-card__meta">Adresse{{ addressData()?.Number ? ' · ' +
+                                    addressData()!.Number : '' }}</p>
                             </div>
                         </div>
 
                         <div class="supplier-card__rows">
-                            @if (addr.Phone) {
                             <div class="supplier-card__row">
                                 <p>Telefon</p>
-                                <strong>{{ addr.Phone }}</strong>
+                                <strong>{{ addressData()?.Phone || '' }}</strong>
                             </div>
-                            }
-                            @if (addr.EMail) {
                             <div class="supplier-card__row">
                                 <p>E-Mail</p>
-                                <strong>{{ addr.EMail }}</strong>
+                                <strong>{{ addressData()?.EMail || '' }}</strong>
                             </div>
-                            }
-                            @if (addr.Street || addr.Zip || addr.City) {
                             <div class="supplier-card__row supplier-card__row--multiline">
                                 <p>Adresse</p>
                                 <strong>
-                                    {{ addr.Street }}<br />
-                                    {{ addr.Zip }} {{ addr.City }}{{ addr.Country?.Caption ? ', ' + addr.Country.Caption
-                                    : '' }}
+                                    @if (addressData()?.Street) {
+                                    {{ addressData()!.Street }}<br />
+                                    }
+                                    {{ addressData()?.Zip }} {{ addressData()?.City }}{{ addressData()?.Country?.Caption
+                                    ? ', ' + addressData()!.Country.Caption : '' }}
                                 </strong>
                             </div>
-                            }
-                            @if (addr.VATID) {
+                            @if (addressData()?.VATID) {
                             <div class="supplier-card__row">
                                 <p>UST-ID</p>
-                                <strong>{{ addr.VATID }}</strong>
+                                <strong>{{ addressData()!.VATID }}</strong>
                             </div>
                             }
-                            @if (addr.CustomerNumber) {
+                            @if (addressData()?.CustomerNumber) {
                             <div class="supplier-card__row">
                                 <p>Kundennummer</p>
-                                <strong>{{ addr.CustomerNumber }}</strong>
+                                <strong>{{ addressData()!.CustomerNumber }}</strong>
                             </div>
                             }
                         </div>
                     </div>
-                    }
                 </aside>
             </div>
         </form>

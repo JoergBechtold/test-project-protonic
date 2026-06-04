@@ -263,6 +263,9 @@
     border-radius: 14px;
     background: $background-color-light-main;
     padding: 14px;
+    width: 340px;
+    min-height: 280px;
+    box-sizing: border-box;
 
     &__head {
         display: flex;
@@ -323,6 +326,8 @@
             font-size: 16px;
             font-weight: 700;
             line-height: 1.35;
+            display: block;
+            min-height: 22px;
         }
     }
 }
