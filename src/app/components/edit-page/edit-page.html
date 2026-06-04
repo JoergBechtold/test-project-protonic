@@ -90,7 +90,10 @@
                             <p class="activity-row__label">Adresse</p>
                             <div class="activity-row__value">
                                 <textarea rows="4" formControlName="address"></textarea>
-                                <button class="activity-edit-btn" type="button">Bearbeiten</button>
+                                <button class="activity-edit-btn" type="button" (click)="onEdit()"
+                                    [disabled]="isEditable()">
+                                    Bearbeiten
+                                </button>
                             </div>
                         </div>
 

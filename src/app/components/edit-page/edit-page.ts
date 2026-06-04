@@ -39,6 +39,7 @@ export class EditPage {
   readonly activityTypes = signal<any[]>([]);
   readonly users = signal<any[]>([]);
   readonly addressData = signal<any>(null);
+  readonly isEditable = signal(false);
 
   readonly form = this.formBuilder.nonNullable.group({
     activityType: 'E-Mail',
@@ -73,6 +74,11 @@ export class EditPage {
     this.closed.emit();
   }
 
+  onEdit(): void {
+    this.isEditable.set(true);
+    this.form.enable();
+  }
+
   async save(): Promise<void> {
     if (this.isSaving()) {
       return;
@@ -101,6 +107,8 @@ export class EditPage {
     this.loadError.set('');
     this.saveMessage.set('');
     this.saveError.set('');
+    this.form.disable();
+    this.isEditable.set(false);
 
     try {
       const [details, formdata] = await this.apiService.getActivityDetailsAndFormdata(activityId);
@@ -179,16 +187,6 @@ export class EditPage {
     return value !== null && typeof value === 'object' && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};
-  }
-
-  private pickValue(source: Record<string, unknown>, keys: string[]): unknown {
-    for (const key of keys) {
-      if (key in source) {
-        return source[key];
-      }
-    }
-
-    return '';
   }
 
   private asText(value: unknown, fallback = ''): string {
