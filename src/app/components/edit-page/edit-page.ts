@@ -26,7 +26,6 @@ export class EditPage {
   private readonly defaultActivityId = 1;
 
   readonly activityId = input<number | string | null>(null);
-
   readonly isLoadingFormdata = signal(false);
   readonly isSaving = signal(false);
   readonly loadError = signal('');
@@ -40,6 +39,7 @@ export class EditPage {
   readonly users = signal<any[]>([]);
   readonly addressData = signal<any>(null);
   readonly isEditable = signal(false);
+  readonly allowBodyEdit = signal(true);
 
   readonly form = this.formBuilder.nonNullable.group({
     activityTypeId: '',
@@ -77,6 +77,15 @@ export class EditPage {
   onEdit(): void {
     this.isEditable.set(true);
     this.form.enable();
+
+    // Textarea für Beschreibung deaktivieren, wenn AllowBodyEdit false ist
+    if (!this.allowBodyEdit()) {
+      this.form.controls.address.disable();
+    }
+  }
+
+  onAddressTextChange(): void {
+    this.updateAddressDataFromText(this.form.controls.address.value ?? '');
   }
 
   async save(): Promise<void> {
@@ -89,6 +98,12 @@ export class EditPage {
     this.saveError.set('');
 
     try {
+      // Aktualisiere Adressdaten aus dem Textarea vor dem Speichern
+      const addressText = this.form.controls.address.value;
+      if (addressText && this.addressData()) {
+        this.updateAddressDataFromText(addressText);
+      }
+
       const activityId = this.resolveActivityId();
       const payload = this.buildSavePayload(activityId);
       const response = await firstValueFrom(this.apiService.saveActivity(payload));
@@ -133,16 +148,19 @@ export class EditPage {
         Array.isArray(combinedData['ActivityTypes']) ? combinedData['ActivityTypes'] : [],
       );
       this.users.set(Array.isArray(combinedData['Users']) ? combinedData['Users'] : []);
-      this.addressData.set(combinedData['Address'] || null);
+      this.allowBodyEdit.set(this.asBool(combinedData['AllowBodyEdit']) !== false);
 
       const startDateParsed = this.parseDateTime(combinedData['StartDate']);
       const endDateParsed = this.parseDateTime(combinedData['EndDate']);
 
       // Body-Feld für Notizen/Beschreibung
       const bodyText = this.asText(combinedData['Body'], '');
+      const normalizedAddress = this.buildAddressFromText(bodyText, combinedData['Address']);
 
       const activityTypeId = combinedData['IdActivityType'];
       const assigneeId = combinedData['IdUser'];
+
+      this.addressData.set(normalizedAddress);
 
       console.log('=== LOADING FORM DATA ===');
       console.log('IdActivityType:', activityTypeId);
@@ -158,7 +176,7 @@ export class EditPage {
         endDate: endDateParsed.date,
         endTime: endDateParsed.time,
         assigneeId: assigneeId ? String(assigneeId) : '',
-        address: bodyText,
+        address: this.formatAddress(normalizedAddress) || bodyText,
         finalized: this.asBool(combinedData['Finalized']),
       });
     } catch (error) {
@@ -174,6 +192,12 @@ export class EditPage {
   private buildSavePayload(activityId: number): Record<string, unknown> {
     const basePayload = this.loadedFormdata() ?? {};
     const values = this.form.getRawValue();
+    const normalizedAddress = this.buildAddressFromText(
+      values.address || '',
+      this.addressData() ?? (basePayload as any)['Address'],
+    );
+
+    this.addressData.set(normalizedAddress);
 
     console.log('=== BUILDING SAVE PAYLOAD ===');
     console.log('Form values:', values);
@@ -197,6 +221,7 @@ export class EditPage {
       EndDate: this.formatDateTimeForApi(values.endDate, values.endTime),
       IdUser: idUser !== undefined ? idUser : (basePayload as any)['IdUser'],
       Body: values.address || '',
+      Address: normalizedAddress,
       Finalized: values.finalized,
     };
 
@@ -334,5 +359,66 @@ export class EditPage {
     }
 
     return '';
+  }
+
+  private updateAddressDataFromText(text: string): void {
+    this.addressData.set(this.buildAddressFromText(text, this.addressData()));
+  }
+
+  private buildAddressFromText(
+    text: string,
+    fallbackAddress: unknown,
+  ): Record<string, unknown> | null {
+    const currentAddress = this.asRecord(fallbackAddress);
+
+    const lines = text
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+
+    if (lines.length === 0) {
+      return Object.keys(currentAddress).length > 0 ? { ...currentAddress } : null;
+    }
+
+    const updatedAddress: Record<string, unknown> = { ...currentAddress };
+
+    if (lines[0]) {
+      const nameParts = lines[0].split(/\s+/).filter(Boolean);
+      if (nameParts.length > 1) {
+        updatedAddress['FirstName'] = nameParts[0];
+        updatedAddress['Surname'] = nameParts.slice(1).join(' ');
+      } else {
+        updatedAddress['FirstName'] = '';
+        updatedAddress['Surname'] = lines[0];
+      }
+    } else {
+      updatedAddress['FirstName'] = '';
+      updatedAddress['Surname'] = '';
+    }
+
+    updatedAddress['Street'] = lines[1] ?? '';
+
+    if (lines[2]) {
+      const zipCityMatch = lines[2].match(/^(\d+)\s+(.+)$/);
+      if (zipCityMatch) {
+        updatedAddress['Zip'] = zipCityMatch[1];
+        updatedAddress['City'] = zipCityMatch[2];
+      } else {
+        updatedAddress['Zip'] = '';
+        updatedAddress['City'] = lines[2];
+      }
+    } else {
+      updatedAddress['Zip'] = '';
+      updatedAddress['City'] = '';
+    }
+
+    if (updatedAddress['Country'] && typeof updatedAddress['Country'] === 'object') {
+      updatedAddress['Country'] = {
+        ...(updatedAddress['Country'] as Record<string, unknown>),
+        Caption: lines[3] ?? '',
+      };
+    }
+
+    return updatedAddress;
   }
 }

@@ -1,5 +1,7 @@
 import { Component, DestroyRef, effect, inject, input, signal } from '@angular/core';
 
+export const POPUP_DISPLAY_DURATION_MS = 3000;
+
 @Component({
   selector: 'app-popup',
   standalone: true,
@@ -9,11 +11,11 @@ import { Component, DestroyRef, effect, inject, input, signal } from '@angular/c
 export class PopupComponent {
   private readonly destroyRef = inject(DestroyRef);
   readonly trigger = input<boolean>(false);
+  readonly displayDuration = input<number>(POPUP_DISPLAY_DURATION_MS);
 
   readonly shouldRender = signal(false);
   readonly animationState = signal<'enter' | 'exit'>('exit');
 
-  private readonly DISPLAY_DURATION = 3000;
   private readonly ANIMATION_DURATION = 200;
   private displayTimeoutId: ReturnType<typeof setTimeout> | null = null;
   private hideTimeoutId: ReturnType<typeof setTimeout> | null = null;
@@ -51,7 +53,7 @@ export class PopupComponent {
 
     this.displayTimeoutId = setTimeout(() => {
       this.hide();
-    }, this.DISPLAY_DURATION);
+    }, this.displayDuration());
   }
 
   private hide(): void {

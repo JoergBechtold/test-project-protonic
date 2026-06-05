@@ -88,9 +88,17 @@
                         </div>
 
                         <div class="activity-row activity-row--address">
-                            <p class="activity-row__label">Beschreibung</p>
+                            <p class="activity-row__label">
+                                Beschreibung
+                                @if (!allowBodyEdit()) {
+                                <small>
+                                    Dieses Feld kann nicht bearbeitet werden
+                                </small>
+                                }
+                            </p>
                             <div class="activity-row__value">
-                                <textarea rows="4" formControlName="address"></textarea>
+                                <textarea rows="4" formControlName="address" (input)="onAddressTextChange()"
+                                    [attr.disabled]="!allowBodyEdit() && isEditable() ? true : null"></textarea>
                                 <button class="activity-edit-btn" type="button" (click)="onEdit()"
                                     [disabled]="isEditable()">
                                     Bearbeiten

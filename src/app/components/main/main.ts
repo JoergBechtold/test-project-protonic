@@ -1,9 +1,9 @@
-import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal, input } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { firstValueFrom } from 'rxjs';
 import { Loading } from '../../shared/components/loading/loading';
-import { PopupComponent } from '../../shared/components/popup/popup';
+import { POPUP_DISPLAY_DURATION_MS, PopupComponent } from '../../shared/components/popup/popup';
 import { TicketCell, TicketCellViewModel } from './components/ticket-cell/ticket-cell';
 import { EditPage } from '../edit-page/edit-page';
 
@@ -21,6 +21,7 @@ export class MainComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly router = inject(Router);
   private readonly pageSize = 6;
+  readonly popupDisplayDuration = POPUP_DISPLAY_DURATION_MS;
 
   isLoading = signal(true);
   errorMessage = signal('ES ist ein Fehler aufgetreten.');
@@ -260,8 +261,13 @@ export class MainComponent implements OnInit {
     this.closeEditPage();
     this.showSavePopup.set(false);
     queueMicrotask(() => this.showSavePopup.set(true));
-    // Liste im Hintergrund neu laden (ohne Loading-Screen)
     await this.loadActivities(true);
+    await this.wait(this.popupDisplayDuration);
+    this.showSavePopup.set(false);
+  }
+
+  private wait(durationMs: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, durationMs));
   }
 
   async logout(): Promise<void> {

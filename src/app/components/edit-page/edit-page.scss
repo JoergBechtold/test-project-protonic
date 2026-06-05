@@ -221,6 +221,14 @@
         letter-spacing: 0.04em;
         text-transform: uppercase;
         color: $edit-page-label-color;
+
+        small {
+            display: block;
+            font-size: 0.85em;
+            color: $error-color;
+            font-weight: normal;
+            margin-top: 4px;
+        }
     }
 
     input,
@@ -293,6 +301,9 @@
         font-size: 24px;
         font-weight: 700;
         line-height: 1.1;
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     &__meta {
@@ -300,6 +311,9 @@
         color: $edit-page-label-color;
         font-size: 14px;
         font-weight: 500;
+        word-wrap: break-word;
+        word-break: break-word;
+        overflow-wrap: break-word;
     }
 
     &__rows {
@@ -318,16 +332,17 @@
             color: $edit-page-label-color;
             font-size: 13px;
             font-weight: 600;
-            line-height: 1.4;
         }
 
         strong {
             color: $edit-page-heading-color;
             font-size: 16px;
             font-weight: 700;
-            line-height: 1.35;
             display: block;
             min-height: 22px;
+            word-wrap: break-word;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
     }
 }
@@ -349,6 +364,14 @@
         font-size: 15px;
         font-weight: 700;
         color: $edit-page-heading-color;
+
+        small {
+            display: block;
+            font-size: 0.85em;
+            color: $error-color;
+            font-weight: normal;
+            margin-top: 4px;
+        }
     }
 
     &__value {

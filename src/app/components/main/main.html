@@ -1,5 +1,7 @@
 <app-loading [visible]="isLoading()" />
-<app-popup [trigger]="showSavePopup()">Änderungen wurden gespeichert</app-popup>
+<app-popup [trigger]="showSavePopup()" [displayDuration]="popupDisplayDuration">Änderungen wurden
+    gespeichert</app-popup>
+
 
 @if (isEditPopupOpen()) {
 <app-edit-page [activityId]="selectedTicketId()" (closeRequested)="onEditPageSaved()"
