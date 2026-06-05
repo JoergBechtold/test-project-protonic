@@ -97,7 +97,7 @@
                                 }
                             </p>
                             <div class="activity-row__value">
-                                <textarea rows="4" formControlName="address" (input)="onAddressTextChange()"
+                                <textarea rows="4" formControlName="address"
                                     [attr.disabled]="!allowBodyEdit() && isEditable() ? true : null"></textarea>
                                 <button class="activity-edit-btn" type="button" (click)="onEdit()"
                                     [disabled]="isEditable()">

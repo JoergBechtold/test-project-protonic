@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, effect, inject, signal, input } from '@angular/core';
+import { Component, OnInit, computed, effect, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { ApiService } from '../../shared/services/api.service';
 import { firstValueFrom } from 'rxjs';
